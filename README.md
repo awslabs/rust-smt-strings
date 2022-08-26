@@ -1,4 +1,4 @@
-## My Project
+## rust-smt-strings
 
 This Rust library provides support building and operating on strings
 and regular expressions as defined in the
