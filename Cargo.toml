@@ -1,6 +1,4 @@
 [package]
-# Your package name _must_ start with amzn.
-# This helps mitigate the risk of name collisions with third-party crates.
 name = "amzn-smt-strings"
 edition = "2018"
 version = "0.1.0"
