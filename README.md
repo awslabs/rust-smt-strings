@@ -1,11 +1,9 @@
 ## My Project
 
-TODO: Fill this README out!
+This Rust library provides support building and operating on strings
+and regular expressions as defined in the
+[SMT-LIB theory of strings](http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml).
 
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
 
 ## Security
 
