@@ -409,8 +409,8 @@ impl RE {
 
     /// pick a representative element in a derivative class
     ///
-    /// - if cid is Some(i): pick in class i
-    /// - if cid is None: pick in the complementary class
+    /// - if cid is Interval(i): pick in class i
+    /// - if cid is Complement: pick in the complementary class
     ///
     fn pick_class_rep(&self, cid: ClassId) -> u32 {
         self.deriv_class.pick_in_class(cid)
@@ -1843,6 +1843,54 @@ impl ReManager {
     fn deriv(&mut self, e: RegLan, c: u32) -> RegLan {
         let cid = e.class_of_char(c);
         self.cached_deriv(e, cid)
+    }
+
+    ///
+    /// Check whether character c can start expression e
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use amzn_smt_strings::regular_expressions::*;
+    ///
+    /// let mut re = ReManager::new();
+    ///
+    /// let digits = re.range('0' as u32, '9' as u32);
+    /// let s = re.star(digits);
+    ///
+    /// assert!(re.start_char(s, '1' as u32));
+    /// assert!(! re.start_char(s, 'a' as u32));
+    /// ```
+    pub fn start_char(&mut self, e: RegLan, c: u32) -> bool {
+        match &e.expr {
+            BaseRegLan::Empty => false,
+            BaseRegLan::Epsilon => false,
+            BaseRegLan::Range(set) => set.contains(c),
+            BaseRegLan::Concat(e1, e2) => {
+                self.start_char(e1, c) || e1.nullable && self.start_char(e2, c)
+            }
+            BaseRegLan::Loop(e, _) => self.start_char(e, c),
+            BaseRegLan::Inter(args) => args.iter().all(|x| self.start_char(x, c)),
+            BaseRegLan::Union(args) => args.iter().any(|x| self.start_char(x, c)),
+            BaseRegLan::Complement(_) => {
+                // expensive case
+                let d = self.deriv(e, c);
+                !self.is_empty_re(d)
+            }
+        }
+    }
+
+    ///
+    /// Check whether all characters in class cid can start e
+    /// - return Error if cid is not a valid class for e
+    ///
+    pub fn start_class(&mut self, e: RegLan, cid: ClassId) -> Result<bool, Error> {
+        if e.valid_class_id(cid) {
+            let c = e.pick_class_rep(cid);
+            Ok(self.start_char(e, c))
+        } else {
+            Err(Error::BadClassId)
+        }
     }
 
     ///
