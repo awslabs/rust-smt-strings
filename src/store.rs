@@ -80,30 +80,6 @@ impl<T: HashConsed + 'static> Store<T> {
     }
 }
 
-/*
-
-// TODO: uncomment this?
-
-// Dangerous but this is a way to avoid memory leaks.
-//
-// When the store is dropped, free all the hash-consed elements.
-// All the &'static T references built from this store are unusable
-// after this.
-impl<T: HashConsed + 'static> std::ops::Drop for Store<T> {
-    fn drop(&mut self) {
-        unsafe {
-            for (_, r) in self.map.iter() {
-                // this ugly pointer juggling is required because
-                // Box::from_raw takes a mut pointer.
-                let p1 = *r as *const T;
-                let p2 = p1 as *mut T;
-                let _b = Box::from_raw(p2);
-            }
-        }
-    }
-}
-*/
-
 #[cfg(test)]
 mod test_store {
     use super::*;
