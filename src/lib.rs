@@ -6,8 +6,8 @@
 //! # Overview
 //!
 //! This crate includes support for building and operating on string constants
-//! and regular expressions as defined in the SMT-LIB theory of strings:
-//! <http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml>.
+//! and regular expressions as defined in the
+//! [SMT-LIB theory of strings](<http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml>).
 //!
 //! The [smt_strings](crate::smt_strings) module implements the SMT-LIB functions defined
 //! in the theory that do not use regular expressions.
