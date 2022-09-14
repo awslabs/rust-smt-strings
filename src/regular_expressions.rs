@@ -1794,7 +1794,7 @@ impl ReManager {
 
     /// Compute the derivative w.r.t. c of all elements of list
     fn deriv_list(&mut self, list: &[RegLan], c: u32) -> Vec<RegLan> {
-        list.iter().map(|r| self.deriv(*r, c)).collect()
+        list.iter().map(|r| self.deriv(r, c)).collect()
     }
 
     /// Derivative of e with respect to a character c
