@@ -7,6 +7,9 @@
 //! This module defines the abstract syntax of regular expressions [BaseRegLan]
 //! and the regular expression type [RE]. Regular expressions are built using
 //! an [ReManager], which provides hash consing.
+//! 
+//! **Important**: Because of hash consing, regular expressions created with different
+//! [ReManager]s are not compatible. It's recommended to use only one [ReManager].
 //!
 //! Input to the manager's methods are static references to [RE] objects
 //! (see type [RegLan]). The manager also returns objects of type [RegLan]
