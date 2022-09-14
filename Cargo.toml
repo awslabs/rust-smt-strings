@@ -6,7 +6,7 @@ repository = "https://github.com/awslabs/rust-smt-strings"
 authors = ["Bruno Dutertre <dutebrun@amazon.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-keywords = ["smt", "smt-lib", "strings", "regular expressions"]
+keywords = ["smt", "smt-lib", "strings", "regular-expressions"]
 categories = ["science"]
 edition = "2018"
 
