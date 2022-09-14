@@ -10,7 +10,5 @@ keywords = ["smt", "smt-lib", "strings", "regular expressions"]
 categories = ["science"]
 edition = "2018"
 
-publish = false
-
 [profile.release]
 lto = true
