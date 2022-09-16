@@ -22,7 +22,7 @@ thread_local!(static MANAGER : RefCell<ReManager> = RefCell::new(ReManager::new(
 ///
 /// # Example
 /// ```
-/// use amzn_smt_strings::{smt_strings::*, smt_regular_expressions::*};
+/// use aws_smt_strings::{smt_strings::*, smt_regular_expressions::*};
 ///
 /// let test = SmtString::from("abcde");
 /// let re = str_to_re(&test);
@@ -38,7 +38,7 @@ pub fn str_to_re(s: &SmtString) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::{smt_strings::*, smt_regular_expressions::*};
+/// use aws_smt_strings::{smt_strings::*, smt_regular_expressions::*};
 ///
 /// let test = EMPTY;
 /// assert!(! str_in_re(&test, re_none()));
@@ -53,7 +53,7 @@ pub fn re_none() -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::{smt_strings::*, smt_regular_expressions::*};
+/// use aws_smt_strings::{smt_strings::*, smt_regular_expressions::*};
 ///
 /// assert!(str_in_re(&EMPTY, re_all()));
 /// assert!(str_in_re(&"18938".into(), re_all()));
@@ -68,7 +68,7 @@ pub fn re_all() -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r = re_allchar();
 /// assert!(str_in_re(&"A".into(), r));
@@ -85,7 +85,7 @@ pub fn re_allchar() -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let aaa = str_to_re(&"aaa".into());
 /// let bbb = str_to_re(&"bbb".into());
@@ -101,7 +101,7 @@ pub fn re_concat(r1: RegLan, r2: RegLan) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r1 = str_to_re(&"abc".into());
 /// let r2 = re_allchar();
@@ -118,7 +118,7 @@ pub fn re_concat_list(a: impl IntoIterator<Item = RegLan>) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r1 = re_star(str_to_re(&"a".into()));
 /// let r2 = re_star(str_to_re(&"b".into()));
@@ -137,7 +137,7 @@ pub fn re_union(r1: RegLan, r2: RegLan) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r1 = re_plus(str_to_re(&"a".into()));
 /// let r2 = re_plus(str_to_re(&"b".into()));
@@ -155,7 +155,7 @@ pub fn re_union_list(a: impl IntoIterator<Item = RegLan>) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r1 = re_star(str_to_re(&"a".into()));
 /// let r2 = re_star(str_to_re(&"b".into()));
@@ -173,7 +173,7 @@ pub fn re_inter(r1: RegLan, r2: RegLan) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r1 = re_concat(str_to_re(&"aaaa".into()), re_all());
 /// let r2 = re_concat(str_to_re(&"aaa".into()), re_all());
@@ -191,7 +191,7 @@ pub fn re_inter_list(a: impl IntoIterator<Item = RegLan>) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r = re_star(re_union(str_to_re(&"aba".into()), str_to_re(&"cc".into())));
 /// assert!(str_in_re(&"ccccabacc".into(), r));
@@ -206,7 +206,7 @@ pub fn re_star(r: RegLan) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r = re_comp(str_to_re(&"abcd".into()));
 /// assert!(! str_in_re(&"abcd".into(), r));
@@ -222,7 +222,7 @@ pub fn re_comp(r: RegLan) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r1 = re_all();
 /// let r2 = re_concat(re_allchar(), re_allchar());
@@ -250,7 +250,7 @@ pub fn re_diff_list(r: RegLan, a: impl IntoIterator<Item = RegLan>) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r = re_union(str_to_re(&"ab".into()), str_to_re(&"cde".into()));
 /// assert!(str_in_re(&"abcdeab".into(), re_plus(r)));
@@ -265,7 +265,7 @@ pub fn re_plus(r: RegLan) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let r = str_to_re(&"abcd".into());
 /// let opt_r = re_opt(r);
@@ -282,7 +282,7 @@ pub fn re_opt(r: RegLan) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let digit = re_range(&"0".into(), &"9".into());
 /// assert!(str_in_re(&"6".into(), digit));
@@ -298,7 +298,7 @@ pub fn re_range(s1: &SmtString, s2: &SmtString) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let digit = re_range(&"0".into(), &"9".into());
 /// let three_digits = re_power(digit, 3);
@@ -314,7 +314,7 @@ pub fn re_power(r: RegLan, k: u32) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let digit = re_range(&"0".into(), &"9".into());
 /// let two_to_five_digits = re_loop(digit, 2, 5);
@@ -332,7 +332,7 @@ pub fn re_loop(r: RegLan, i: u32, j: u32) -> RegLan {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let any = re_allchar();
 /// let all = re_all();
@@ -360,7 +360,7 @@ fn find_match(r: RegLan, s: &[u32], k: usize, allow_empty: bool) -> SearchResult
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let a_star = re_star(str_to_re(&"a".into()));
 /// assert_eq!(str_replace_re(&"baab".into(), a_star, &"cc".into()), "ccbaab".into());
@@ -391,7 +391,7 @@ pub fn str_replace_re(s1: &SmtString, r: RegLan, s2: &SmtString) -> SmtString {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::smt_regular_expressions::*;
+/// use aws_smt_strings::smt_regular_expressions::*;
 ///
 /// let a_star = re_star(str_to_re(&"a".into()));
 /// assert_eq!(str_replace_re_all(&"baab".into(), a_star, &"cd".into()), "bcdcdb".into());

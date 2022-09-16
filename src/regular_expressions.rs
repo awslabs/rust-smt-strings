@@ -7,7 +7,7 @@
 //! This module defines the abstract syntax of regular expressions [BaseRegLan]
 //! and the regular expression type [RE]. Regular expressions are built using
 //! an [ReManager], which provides hash consing.
-//! 
+//!
 //! **Important**: Because of hash consing, regular expressions created with different
 //! [ReManager]s are not compatible. It's recommended to use only one [ReManager].
 //!
@@ -1027,7 +1027,7 @@ struct DerivKey(RegLan, ClassId);
 /// compute its derivatives.
 ///
 /// ```
-/// use amzn_smt_strings::regular_expressions::*;
+/// use aws_smt_strings::regular_expressions::*;
 ///
 /// let re = &mut ReManager::new();
 /// let ac = re.str(&"ac".into());  // ac
@@ -1118,7 +1118,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new(); // create a manager
     /// let e = re.empty();        // get the empty language
@@ -1137,7 +1137,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new(); // create a manager
     /// let e = re.full();        // get the full language
@@ -1154,7 +1154,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     /// let e = re.epsilon();
@@ -1175,7 +1175,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     /// let e = re.sigma_plus();
@@ -1198,8 +1198,8 @@ impl ReManager {
     ///
     /// Lower-case letters in ASCII.
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// let mut re = ReManager::new();
     /// let set = CharSet::range('a' as u32, 'z' as u32);
@@ -1224,7 +1224,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     /// let a_single_digit = re.range('0' as u32, '9' as u32);
@@ -1247,7 +1247,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     /// let a_letter = re.range('a' as u32, 'z' as u32);
@@ -1305,7 +1305,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1338,7 +1338,7 @@ impl ReManager {
     /// Regular expression that recognizes sequences of 3 to 5 digits.
     ///
     /// ```
-    /// use amzn_smt_strings::{regular_expressions::*, loop_ranges::*};
+    /// use aws_smt_strings::{regular_expressions::*, loop_ranges::*};
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1437,7 +1437,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1481,7 +1481,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1525,7 +1525,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1582,7 +1582,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1608,7 +1608,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1629,7 +1629,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1651,7 +1651,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1673,7 +1673,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1698,7 +1698,7 @@ impl ReManager {
     /// All strings of length 5.
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1721,7 +1721,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1746,7 +1746,7 @@ impl ReManager {
     /// - otherwise, return the empty language
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1773,7 +1773,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1854,7 +1854,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let mut re = ReManager::new();
     ///
@@ -1944,7 +1944,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::{regular_expressions::*, character_sets::*};
+    /// use aws_smt_strings::{regular_expressions::*, character_sets::*};
     /// # use std::error::Error;
     /// #
     /// # fn main() -> Result<(), Box<dyn Error>> {
@@ -2004,7 +2004,7 @@ impl ReManager {
     ///
     /// # Example
     /// ```
-    /// use amzn_smt_strings::{regular_expressions::*, character_sets::*};
+    /// use aws_smt_strings::{regular_expressions::*, character_sets::*};
     /// # use std::error::Error;
     /// #
     /// # fn main() -> Result<(), Box<dyn Error>> {
@@ -2051,7 +2051,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// fn sum_of_str(re: &mut ReManager, s1: &str, s2: &str) -> RegLan {
     ///     let s1 = re.str(&s1.into());
@@ -2082,7 +2082,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let re = &mut ReManager::new();
     /// let abc = re.str(&"abc".into());
@@ -2122,7 +2122,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let re = &mut ReManager::new();
     ///
@@ -2145,7 +2145,7 @@ impl ReManager {
     ///
     /// # Example
     /// ```
-    /// use amzn_smt_strings::regular_expressions::*;
+    /// use aws_smt_strings::regular_expressions::*;
     ///
     /// let re = &mut ReManager::new();
     ///
@@ -2197,7 +2197,7 @@ impl ReManager {
     ///
     /// # Example
     /// ```
-    /// use amzn_smt_strings::{regular_expressions::*, smt_strings::*};
+    /// use aws_smt_strings::{regular_expressions::*, smt_strings::*};
     ///
     /// let re = &mut ReManager::new();
     ///
@@ -2267,7 +2267,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::{regular_expressions::*, automata::*};
+    /// use aws_smt_strings::{regular_expressions::*, automata::*};
     ///
     /// let re = &mut ReManager::new();
     ///
@@ -2301,7 +2301,7 @@ impl ReManager {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::{regular_expressions::*, automata::*};
+    /// use aws_smt_strings::{regular_expressions::*, automata::*};
     ///
     /// let re = &mut ReManager::new();
     ///

@@ -122,7 +122,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32);
     /// assert!(c.contains('g' as u32));
@@ -137,7 +137,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32);
     /// assert!(c.covers(&CharSet::singleton('g' as u32)));
@@ -156,7 +156,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32);
     /// assert!(c.is_before(127));
@@ -173,7 +173,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32);
     /// assert!(! c.is_after(127));
@@ -190,7 +190,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32);
     /// assert_eq!(c.size(), 26);
@@ -205,7 +205,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32);
     /// let d = CharSet::singleton('K' as u32);
@@ -221,7 +221,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::{character_sets::CharSet, smt_strings::MAX_CHAR};
+    /// use aws_smt_strings::{character_sets::CharSet, smt_strings::MAX_CHAR};
     ///
     /// let c = CharSet::range(0, MAX_CHAR);
     /// let d = CharSet::range('a' as u32, 'z' as u32);
@@ -237,7 +237,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32);
     /// let d = c.pick();
@@ -255,7 +255,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32); // ['a', 'z']
     /// let d = CharSet::range('t' as u32, 127);  // ['t', 127]
@@ -301,7 +301,7 @@ impl CharSet {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::CharSet;
+    /// use aws_smt_strings::character_sets::CharSet;
     ///
     /// let c = CharSet::range('a' as u32, 'z' as u32);
     /// let d = CharSet::range('t' as u32, 127);
@@ -434,7 +434,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// let p = CharPartition::from_set(&CharSet::range('a' as u32, 'b' as u32));
     /// assert_eq!(p.len(), 1);
@@ -461,7 +461,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// # use std::error::Error;
     /// #
@@ -517,7 +517,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// # use std::error::Error;
     /// #
@@ -551,7 +551,7 @@ impl CharPartition {
     /// This constructs the two-interval partition `['0', '9'] ['Z', 'Z']`.
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// let mut p = CharPartition::new();
     /// p.push('0' as u32, '9' as u32);
@@ -579,8 +579,8 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
-    /// use amzn_smt_strings::smt_strings::MAX_CHAR;
+    /// use aws_smt_strings::character_sets::*;
+    /// use aws_smt_strings::smt_strings::MAX_CHAR;
     ///
     /// // partition ['0', '9'] ['Z', 'Z']
     /// let mut p = CharPartition::new();
@@ -608,7 +608,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// let mut p = CharPartition::new();
     /// p.push('a' as u32, 'z' as u32);
@@ -626,8 +626,8 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
-    /// use amzn_smt_strings::smt_strings::MAX_CHAR;
+    /// use aws_smt_strings::character_sets::*;
+    /// use aws_smt_strings::smt_strings::MAX_CHAR;
     ///
     /// let mut p = CharPartition::new();
     /// p.push('a' as u32, 'z' as u32);
@@ -650,8 +650,8 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
-    /// use amzn_smt_strings::smt_strings::MAX_CHAR;
+    /// use aws_smt_strings::character_sets::*;
+    /// use aws_smt_strings::smt_strings::MAX_CHAR;
     ///
     /// let mut p = CharPartition::new();
     /// p.push('a' as u32, 'z' as u32);
@@ -676,7 +676,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// let mut p = CharPartition::new();
     /// p.push('a' as u32, 'z' as u32);
@@ -692,8 +692,8 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
-    /// use amzn_smt_strings::smt_strings::MAX_CHAR;
+    /// use aws_smt_strings::character_sets::*;
+    /// use aws_smt_strings::smt_strings::MAX_CHAR;
     ///
     /// let mut p = CharPartition::new();
     /// p.push(0, 127);
@@ -712,8 +712,8 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
-    /// use amzn_smt_strings::smt_strings::MAX_CHAR;
+    /// use aws_smt_strings::character_sets::*;
+    /// use aws_smt_strings::smt_strings::MAX_CHAR;
     ///
     /// // partition with a single interval ['a', 'z']
     /// let p = CharPartition::from_set(&CharSet::range('a' as u32, 'z' as u32));
@@ -731,7 +731,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// // partition with two intervals and three classes
     /// let mut p = CharPartition::new();
@@ -757,7 +757,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// // partition with two intervals and three classes
     /// let mut p = CharPartition::new();
@@ -789,8 +789,8 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::{ClassId::*, *};
-    /// use amzn_smt_strings::smt_strings::MAX_CHAR;
+    /// use aws_smt_strings::character_sets::{ClassId::*, *};
+    /// use aws_smt_strings::smt_strings::MAX_CHAR;
     ///
     /// let mut p = CharPartition::new();
     /// p.push('0' as u32, '9' as u32);
@@ -879,7 +879,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// let p = CharPartition::from_set(&CharSet::range('0' as u32, '9' as u32));
     /// let test1 = CharSet::range('4' as u32, '8' as u32);
@@ -977,7 +977,7 @@ impl CharPartition {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::character_sets::*;
+    /// use aws_smt_strings::character_sets::*;
     ///
     /// let p = CharPartition::from_set(&CharSet::range('0' as u32, '9' as u32));
     /// let test1 = CharSet::range('4' as u32, '8' as u32);
@@ -1086,7 +1086,7 @@ impl<'a> Iterator for PickIterator<'a> {
 /// # Example
 ///
 /// ```
-/// use amzn_smt_strings::character_sets::*;
+/// use aws_smt_strings::character_sets::*;
 ///
 /// // partition p with intervals ['0', '9'] and ['a', 'g']
 /// let mut p = CharPartition::new();

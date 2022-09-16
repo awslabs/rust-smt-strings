@@ -322,7 +322,7 @@ impl LoopRange {
     /// # Example
     ///
     /// ```
-    /// use amzn_smt_strings::loop_ranges::*;
+    /// use aws_smt_strings::loop_ranges::*;
     ///
     /// let r = LoopRange::point(2); // range [2, 2]
     /// let s = LoopRange::star();   // range [0, +infinity]

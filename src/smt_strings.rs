@@ -110,7 +110,7 @@ impl AsRef<[u32]> for SmtString {
 ///
 /// # Example
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert_eq!(SmtString::from(""), EMPTY);
 /// assert_eq!(SmtString::from("\u{0331}"), SmtString::from(0x331));
@@ -134,7 +134,7 @@ impl From<String> for SmtString {
 ///
 /// # Example
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert_eq!(SmtString::from(&[97, 98, 99]), SmtString::from("abc"));
 /// ```
@@ -330,7 +330,7 @@ impl ParsingAutomaton {
 ///
 /// # Example
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert_eq!(parse_smt_literal("abc"), SmtString::from(&[97, 98, 99]));
 /// assert_eq!(parse_smt_literal(r"a\u0000C"), SmtString::from(&[97, 0, 67]));
@@ -566,7 +566,7 @@ fn find_sub_vector(v: &[u32], w: &[u32], i: usize) -> SearchResult {
 ///
 /// # Example
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("aa");
 /// let s2 = SmtString::from("bb");
@@ -582,7 +582,7 @@ pub fn str_concat(s1: &SmtString, s2: &SmtString) -> SmtString {
 ///
 /// # Example
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert_eq!(str_len(&EMPTY), 0);
 /// assert_eq!(str_len(&SmtString::from("abc")), 3);
@@ -599,7 +599,7 @@ pub fn str_len(s: &SmtString) -> i32 {
 ///
 /// # Example
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s = SmtString::from("abcd");
 ///
@@ -623,7 +623,7 @@ pub fn str_at(s: &SmtString, i: i32) -> SmtString {
 ///
 /// # Example
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s = SmtString::from("abcdef");
 ///
@@ -647,7 +647,7 @@ pub fn str_substr(s: &SmtString, i: i32, n: i32) -> SmtString {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("abcdef");
 /// let s2 = SmtString::from("abcd");
@@ -672,7 +672,7 @@ pub fn str_lt(s1: &SmtString, s2: &SmtString) -> bool {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("abcdef");
 /// let s2 = SmtString::from("abcd");
@@ -695,7 +695,7 @@ pub fn str_le(s1: &SmtString, s2: &SmtString) -> bool {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("abcdef");
 /// let s2 = SmtString::from("abcd");
@@ -716,7 +716,7 @@ pub fn str_prefixof(s1: &SmtString, s2: &SmtString) -> bool {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("abcdef");
 /// let s2 = SmtString::from("def");
@@ -737,7 +737,7 @@ pub fn str_suffixof(s1: &SmtString, s2: &SmtString) -> bool {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("abcdef");
 /// let s2 = SmtString::from("cde");
@@ -765,7 +765,7 @@ pub fn str_contains(s1: &SmtString, s2: &SmtString) -> bool {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("abcdef");
 /// let s2 = SmtString::from("cde");
@@ -799,7 +799,7 @@ pub fn str_indexof(s1: &SmtString, s2: &SmtString, i: i32) -> i32 {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("abcdef");
 /// let s2 = SmtString::from("cde");
@@ -836,7 +836,7 @@ pub fn str_replace(s: &SmtString, p: &SmtString, r: &SmtString) -> SmtString {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// let s1 = SmtString::from("abcdcdef");
 /// let s2 = SmtString::from("cd");
@@ -870,7 +870,7 @@ pub fn str_replace_all(s: &SmtString, p: &SmtString, r: &SmtString) -> SmtString
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert!(str_is_digit(&SmtString::from("0")));
 /// assert!(! str_is_digit(&SmtString::from("A")));
@@ -884,7 +884,7 @@ pub fn str_is_digit(s: &SmtString) -> bool {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert_eq!(str_to_code(&EMPTY), -1);
 /// assert_eq!(str_to_code(&SmtString::from(1202)), 1202);
@@ -906,7 +906,7 @@ pub fn str_to_code(s: &SmtString) -> i32 {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert_eq!(str_from_code(-19), EMPTY);
 /// assert_eq!(str_from_code(1202), SmtString::from(1202));
@@ -932,7 +932,7 @@ pub fn str_from_code(x: i32) -> SmtString {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert_eq!(str_to_int(&SmtString::from("00982")), 982);
 /// assert_eq!(str_to_int(&EMPTY), -1);
@@ -966,7 +966,7 @@ pub fn str_to_int(s: &SmtString) -> i32 {
 ///
 /// # Examples
 /// ```
-/// use amzn_smt_strings::smt_strings::*;
+/// use aws_smt_strings::smt_strings::*;
 ///
 /// assert_eq!(str_from_int(0), SmtString::from("0"));
 /// assert_eq!(str_from_int(-1), EMPTY);
