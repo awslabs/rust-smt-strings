@@ -64,11 +64,9 @@ impl<T: HashConsed + 'static> Store<T> {
         match self.map.entry(k) {
             Entry::Occupied(o) => o.get(),
             Entry::Vacant(e) => {
-                let i = self.counter;
-                let new_obj = T::make(i, e.key());
+                let new_obj = T::make(self.counter, e.key());
                 self.counter += 1;
-                let b = Box::new(new_obj);
-                let p = Box::leak(b);
+                let p = Box::leak(Box::new(new_obj));
                 e.insert(p)
             }
         }

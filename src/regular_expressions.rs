@@ -147,7 +147,7 @@ impl Ord for RE {
     }
 }
 
-/// The hash code of a RE is just the hash code of its id.
+/// The hash code of an RE is just the hash code of its id.
 impl Hash for RE {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.id.hash(state)
@@ -238,7 +238,7 @@ impl BaseRegLan {
         }
     }
 
-    /// Check whether this regular expression a Range
+    /// Check whether this regular expression is a Range
     /// (i.e., an interval of characters [c0, c1])
     fn is_range(&self) -> bool {
         matches!(self, BaseRegLan::Range(..))
@@ -461,10 +461,7 @@ impl Iterator for ReIterator {
     /// List all sub-terms in breadth-first order, without duplicates
     fn next(&mut self) -> Option<Self::Item> {
         fn get_next(queue: &mut BfsQueue<RegLan>) -> Option<RegLan> {
-            if queue.is_empty() {
-                None
-            } else {
-                let x = queue.pop().unwrap();
+            queue.pop().map(|x| {
                 match x.expr {
                     BaseRegLan::Concat(left, right) => {
                         queue.push(left);
@@ -484,8 +481,8 @@ impl Iterator for ReIterator {
                     }
                     _ => (),
                 }
-                Some(x)
-            }
+                x
+            })
         }
 
         get_next(&mut self.queue)
@@ -603,7 +600,7 @@ fn set_to_singleton<'a>(a: &mut Vec<&'a RE>, x: &'a RE) {
 ///
 /// We do this when R is a simple pattern, that is, a concatenation
 /// of Range and Loop REs. In this case, we can write R as a concatenation
-/// of basic patterns. Each base pattern is either a sequence of Range
+/// of basic patterns. Each basic pattern is either a sequence of Range
 /// expressions or a sequence of loop expressions. We say that a sequence
 /// of Range expression is a rigid pattern (e.g., it can be something like a string
 /// 'abc'). A sequence of loop expression is a flexible pattern (e.g., something like
@@ -730,7 +727,7 @@ fn char_sets_of_pattern<'a>(p: &[&'a RE]) -> Vec<&'a CharSet> {
         if let BaseRegLan::Range(s) = &r.expr {
             result.push(s)
         } else {
-            panic!()
+            unreachable!()
         }
     }
     result
