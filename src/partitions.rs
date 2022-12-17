@@ -165,7 +165,7 @@ impl BasePartition {
     ///
     fn add_block(&mut self, start: usize, end: usize) -> u32 {
         debug_assert!(start < end && end <= self.size);
-        let id = self.num_blocks() as u32;
+        let id = self.num_blocks();
         self.block.push(BlockHeader { start, end });
         id
     }
@@ -375,7 +375,7 @@ impl Display for BasePartition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for i in 1..self.num_blocks() {
             write!(f, "block[{}]: ", i)?;
-            for x in self.block_elements(i as u32) {
+            for x in self.block_elements(i) {
                 write!(f, " {}", x)?;
             }
             writeln!(f)?;

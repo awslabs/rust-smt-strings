@@ -1262,14 +1262,14 @@ impl ReManager {
             (BaseRegLan::Epsilon, _) => e2,
             (_, BaseRegLan::Epsilon) => e1,
             // R . R^[i,j] --> R^[i+1, j+1]
-            (_, BaseRegLan::Loop(&ref y, rng)) if *e1 == *y => {
+            (_, BaseRegLan::Loop(y, rng)) if *e1 == **y => {
                 self.make(BaseRegLan::Loop(e1, rng.add_point(1)))
             }
-            (BaseRegLan::Loop(&ref x, rng), _) if *e2 == *x => {
+            (BaseRegLan::Loop(x, rng), _) if *e2 == **x => {
                 self.make(BaseRegLan::Loop(e2, rng.add_point(1)))
             }
             // R^[a,b] . R^[b,c] -> R^[a+b, b+c]
-            (BaseRegLan::Loop(&ref x, x_rng), BaseRegLan::Loop(&ref y, y_rng)) if *x == *y => {
+            (BaseRegLan::Loop(x, x_rng), BaseRegLan::Loop(y, y_rng)) if *x == *y => {
                 self.make(BaseRegLan::Loop(x, x_rng.add(y_rng)))
             }
             // R . R -> R^2
@@ -1359,7 +1359,7 @@ impl ReManager {
                 // epsilon ^ [i, j] --> epsilon
                 BaseRegLan::Epsilon => self.epsilon,
                 // (R ^[i,j]) ^ [k, l] --> R ^[i *k, j*l] if the product is exact
-                BaseRegLan::Loop(&ref x, x_rng) if x_rng.right_mul_is_exact(&range) => {
+                BaseRegLan::Loop(x, x_rng) if x_rng.right_mul_is_exact(&range) => {
                     self.make(BaseRegLan::Loop(x, x_rng.mul(&range)))
                 }
                 _ => self.make(BaseRegLan::Loop(e, range)),
