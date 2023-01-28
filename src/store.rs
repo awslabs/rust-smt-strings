@@ -79,6 +79,7 @@ impl<T: HashConsed + 'static> Store<T> {
 }
 
 #[cfg(test)]
+#[allow(clippy::uninlined_format_args)]
 mod test_store {
     use super::*;
     use std::cmp::max;
@@ -185,9 +186,9 @@ mod test_store {
     impl std::fmt::Display for BaseNode {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                Self::Leaf(x) => write!(f, "(leaf {})", x),
+                Self::Leaf(x) => write!(f, "(leaf {x})"),
                 Self::Node(op, children) => {
-                    write!(f, "({}", op)?;
+                    write!(f, "({op}")?;
                     for &child in children.as_ref() {
                         write!(f, " node{}", child.id)?;
                     }

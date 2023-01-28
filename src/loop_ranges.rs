@@ -62,12 +62,12 @@ impl Display for LoopRange {
             LoopRange(1, None) => write!(f, "+"),
             LoopRange(i, Some(j)) => {
                 if i == j {
-                    write!(f, "{}", i)
+                    write!(f, "{i}")
                 } else {
-                    write!(f, "[{}..{}]", i, j)
+                    write!(f, "[{i}..{j}]")
                 }
             }
-            LoopRange(i, None) => write!(f, "[{}..inf)", i),
+            LoopRange(i, None) => write!(f, "[{i}..inf)"),
         }
     }
 }
@@ -378,6 +378,7 @@ impl LoopRange {
     }
 }
 
+#[allow(clippy::uninlined_format_args)]
 #[cfg(test)]
 mod test {
     use super::LoopRange;

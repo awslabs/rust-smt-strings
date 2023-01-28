@@ -488,11 +488,11 @@ impl Display for Automaton {
         for s in self.states.iter() {
             for c in s.char_ranges() {
                 let d = self.char_set_next(s, c).unwrap();
-                writeln!(f, "  \u{03B4}({}, {}) = {}", s, c, d)?;
+                writeln!(f, "  \u{03B4}({s}, {c}) = {d}")?;
             }
             if s.has_default_successor() {
                 let d = s.default_successor().unwrap();
-                writeln!(f, "  \u{03B4}({}, ...) = s{}", s, d)?;
+                writeln!(f, "  \u{03B4}({s}, ...) = {d}")?;
             }
         }
         writeln!(f)?;
@@ -872,21 +872,21 @@ mod test {
             automaton.initial_state()
         );
         for state in automaton.states.iter() {
-            println!("State {}", state);
+            println!("State {state}");
             if state.is_final() {
                 println!("  final");
             }
             match state.default_successor() {
                 None => println!("  no default successor"),
-                Some(x) => println!("  default successor: {}", x),
+                Some(x) => println!("  default successor: {x}"),
             }
             println!("  transitions:");
             for (cid, next) in automaton.edges(state) {
-                println!("  delta({}, {}) = {}", state, cid, next);
+                println!("  delta({state}, {cid}) = {next}");
             }
         }
 
-        println!("{}", automaton);
+        println!("{automaton}");
 
         check_automaton(&automaton);
 
@@ -915,7 +915,7 @@ mod test {
             println!();
         }
 
-        println!("Compact transition map: {}", map);
+        println!("Compact transition map: {map}");
 
         automaton.test_minimizer();
     }
@@ -954,7 +954,7 @@ mod test {
 
         assert_eq!(automaton.num_states(), 8);
 
-        println!("{}", automaton);
+        println!("{automaton}");
 
         automaton.remove_unreachable_states();
         println!(
@@ -963,7 +963,7 @@ mod test {
             automaton.initial_state()
         );
 
-        println!("{}", automaton);
+        println!("{automaton}");
         check_automaton(&automaton);
     }
 
@@ -1006,7 +1006,7 @@ mod test {
             automaton.num_states(),
             automaton.initial_state()
         );
-        println!("{}", automaton);
+        println!("{automaton}");
 
         automaton.test_minimizer();
 
@@ -1016,6 +1016,6 @@ mod test {
             automaton.num_states(),
             automaton.initial_state(),
         );
-        println!("{}", automaton);
+        println!("{automaton}");
     }
 }

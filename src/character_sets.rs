@@ -353,7 +353,7 @@ pub enum CoverResult {
 impl Display for CoverResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CoverResult::CoveredBy(i) => write!(f, "CoveredBy({})", i),
+            CoverResult::CoveredBy(i) => write!(f, "CoveredBy({i})"),
             CoverResult::DisjointFromAll => write!(f, "DisjointFromAll"),
             CoverResult::Overlaps => write!(f, "Overlaps"),
         }
@@ -378,7 +378,7 @@ pub enum ClassId {
 impl Display for ClassId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ClassId::Interval(i) => write!(f, "Interval({})", i),
+            ClassId::Interval(i) => write!(f, "Interval({i})"),
             ClassId::Complement => write!(f, "Complement"),
         }
     }
@@ -997,7 +997,7 @@ impl Display for CharPartition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{{ ")?;
         for r in self.ranges() {
-            write!(f, "{} ", r)?;
+            write!(f, "{r} ")?;
         }
         write!(f, "}}")
     }
@@ -1277,10 +1277,7 @@ mod test {
 
         match CharPartition::try_from_list(&w) {
             Ok(_) => panic!("Partition::try_from_list should have failed"),
-            Err(e) => println!(
-                "Partition::try_from_list failed with error {} as expected",
-                e
-            ),
+            Err(e) => println!("Partition::try_from_list failed with error {e} as expected"),
         }
     }
 
@@ -1431,10 +1428,10 @@ mod test {
         }
 
         for p in &v {
-            println!("Partition: {}", p);
+            println!("Partition: {p}");
             for set in &i {
                 let c = p.interval_cover(set);
-                println!("Cover for {} = {}", set, c);
+                println!("Cover for {set} = {c}");
 
                 match c {
                     CoverResult::CoveredBy(i) => {

@@ -158,7 +158,7 @@ mod test {
         set.insert(40);
         set.insert(40);
 
-        println!("After adding 10, 20, 40: {}", set);
+        println!("After adding 10, 20, 40: {set}");
         assert!(set.contains(10));
         assert!(set.contains(20));
         assert!(set.contains(40));
@@ -166,13 +166,13 @@ mod test {
         assert_eq!(set.card(), 3);
 
         for x in set.iter() {
-            println!("Element: {}", x);
+            println!("Element: {x}");
             assert!(set.contains(x));
         }
 
         set.remove(30);
         set.remove(40);
-        println!("After removing 30, 40: {}", set);
+        println!("After removing 30, 40: {set}");
         assert!(set.contains(10));
         assert!(set.contains(20));
         assert!(!set.contains(30));
@@ -180,7 +180,7 @@ mod test {
         assert_eq!(set.card(), 2);
 
         set.remove(10);
-        println!("After removing 10: {}", set);
+        println!("After removing 10: {set}");
         assert!(set.contains(20));
         assert!(!set.contains(10));
         assert!(!set.contains(30));
@@ -188,7 +188,7 @@ mod test {
         assert_eq!(set.card(), 1);
 
         set.reset();
-        println!("After reset: {}", set);
+        println!("After reset: {set}");
         assert!(!set.contains(20));
         assert!(!set.contains(10));
         assert!(!set.contains(30));

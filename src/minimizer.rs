@@ -294,8 +294,8 @@ impl<D, F> Display for Minimizer<D, F> {
         writeln!(f, "main partition")?;
         writeln!(f, "{}", self.main_partition)?;
         for (i, p) in self.pred_classes.iter().enumerate() {
-            writeln!(f, "pred_class[{}]", i)?;
-            writeln!(f, "{}", p)?;
+            writeln!(f, "pred_class[{i}]")?;
+            writeln!(f, "{p}")?;
         }
         writeln!(f, "Active splitters")?;
         for (i, l) in self.splitters.iter().enumerate() {
@@ -486,7 +486,7 @@ where
                     s.char
                 );
                 for x in self.pred_classes[s.char as usize].block_elements(s.class) {
-                    print!(" {}", x);
+                    print!(" {x}");
                 }
                 println!(" }}");
             }
@@ -509,11 +509,11 @@ where
             round += 1;
             match self.pick_splitter() {
                 Some(s) => {
-                    println!("--- round {} ---", round);
-                    println!("{}", s);
+                    println!("--- round {round} ---");
+                    println!("{s}");
                     print!("pre({}, {}) = {{", s.block, s.char);
                     for x in self.pred_classes[s.char as usize].block_elements(s.class) {
-                        print!(" {}", x);
+                        print!(" {x}");
                     }
                     println!(" }}");
                     self.refine_with_splitter(&s);

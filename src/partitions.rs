@@ -374,9 +374,9 @@ impl Partition {
 impl Display for BasePartition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for i in 1..self.num_blocks() {
-            write!(f, "block[{}]: ", i)?;
+            write!(f, "block[{i}]: ")?;
             for x in self.block_elements(i) {
-                write!(f, " {}", x)?;
+                write!(f, " {x}")?;
             }
             writeln!(f)?;
         }
@@ -397,7 +397,7 @@ mod test {
     #[test]
     fn test() {
         let mut p = Partition::new(20);
-        println!("Initial partition:\n{}", p);
+        println!("Initial partition:\n{p}");
 
         assert_eq!(p.num_blocks(), 2);
         for i in 0..20 {
@@ -410,7 +410,7 @@ mod test {
         let split1 = p.refine_block(1, |x| (x & 1) == 0);
         assert_eq!(split1, (1, 2));
 
-        println!("Even/odd numbers:\n{}", p);
+        println!("Even/odd numbers:\n{p}");
 
         for i in 1..p.num_blocks() {
             p.refine_block(i, |x| x % 3 == 0);
@@ -420,7 +420,7 @@ mod test {
         for i in 0..p.num_blocks() {
             p.sort_block(i);
         }
-        println!("Even/odd/multiples of three:\n{}", p);
+        println!("Even/odd/multiples of three:\n{p}");
 
         // block 0: empty
         // block 1: multiples of 6 (x % 6 == 0)
@@ -445,7 +445,7 @@ mod test {
             assert_eq!(b1 != 0 && b2 != 0, i == 4);
         }
 
-        println!("Split in 5 classes\n{}", p);
+        println!("Split in 5 classes\n{p}");
 
         // block 4: x such that x % 6 == 1
         // new block 5: x % 6 == 5

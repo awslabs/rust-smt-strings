@@ -276,23 +276,23 @@ mod test {
                 }
             }
 
-            println!("Paths from root n{}", i);
+            println!("Paths from root n{i}");
             for j in 0..num_nodes {
                 match queue.path(&Node(j)) {
                     None => {
-                        println!("n{} is not reachable", j);
+                        println!("n{j} is not reachable");
                     }
                     Some(p) => {
-                        print!("n{} is reachable via path (", j);
+                        print!("n{j} is reachable via path (");
                         for l in &p {
-                            print!("{}", l);
+                            print!("{l}");
                         }
                         println!(")");
 
                         let full = queue.full_path_unchecked(&Node(j));
                         print!("   ");
                         for (n, l) in &full {
-                            print!("{}--{}--", n, l);
+                            print!("{n}--{l}--");
                         }
                         println!("{}", Node(j));
                     }

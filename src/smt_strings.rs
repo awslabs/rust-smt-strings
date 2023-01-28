@@ -15,6 +15,7 @@
 
 #![allow(clippy::many_single_char_names)]
 #![allow(clippy::manual_range_contains)]
+#![allow(clippy::uninlined_format_args)]
 
 use crate::matcher::{naive_search, SearchResult};
 use std::slice::Iter;
@@ -49,7 +50,7 @@ impl SmtString {
         if n > MAX_LENGTH as usize {
             panic!(
                 "Cannot construct a string of length {}: max length is {}",
-                n, MAX_LENGTH
+                n, MAX_LENGTH,
             );
         }
         SmtString { s: a }

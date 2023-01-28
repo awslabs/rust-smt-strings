@@ -350,7 +350,7 @@ impl Display for BaseRegLan {
             debug_assert!(!l.is_empty());
             write_sub(f, l[0])?;
             for e in &l[1..] {
-                write!(f, " {} ", symbol)?;
+                write!(f, " {symbol} ")?;
                 write_sub(f, e)?;
             }
             Ok(())
@@ -359,7 +359,7 @@ impl Display for BaseRegLan {
         match self {
             BaseRegLan::Empty => write!(f, "\u{2205}"), // empty set
             BaseRegLan::Epsilon => write!(f, "\u{03B5}"),
-            BaseRegLan::Range(r) => write!(f, "{}", r),
+            BaseRegLan::Range(r) => write!(f, "{r}"),
             BaseRegLan::Concat(e1, e2) => {
                 let mut v = Vec::new();
                 flatten_concat(e1, &mut v);
@@ -371,7 +371,7 @@ impl Display for BaseRegLan {
             }
             BaseRegLan::Loop(e, range) => {
                 write_sub(f, e)?;
-                write!(f, "^{}", range)
+                write!(f, "^{range}")
             }
             BaseRegLan::Complement(e) => {
                 write!(f, "\u{00AC}")?;
@@ -681,7 +681,7 @@ fn base_patterns(r: &[&RE]) -> Vec<BasePattern> {
 
 /// Check whether s[i..pattern.len()-1] matches pattern
 /// Requires i + pattern.len() <= s.lend()
-fn rigid_match_at<'a>(pattern: &[&CharSet], s: &[&'a RE], i: usize) -> bool {
+fn rigid_match_at(pattern: &[&CharSet], s: &[&RE], i: usize) -> bool {
     debug_assert!(i + pattern.len() <= s.len());
     for j in 0..pattern.len() {
         if !s[i + j].expr.match_char_set(pattern[j]) {
@@ -693,7 +693,7 @@ fn rigid_match_at<'a>(pattern: &[&CharSet], s: &[&'a RE], i: usize) -> bool {
 
 /// Search for a match of pattern in sequence s, starting at index i
 /// `pattern` is a rigid pattern represented as a sequence of CharSets
-fn next_rigid_match<'a>(pattern: &[&CharSet], s: &[&'a RE], i: usize) -> SearchResult {
+fn next_rigid_match(pattern: &[&CharSet], s: &[&RE], i: usize) -> SearchResult {
     let p_len = pattern.len();
     let s_len = s.len();
     if s_len >= p_len {
@@ -708,7 +708,7 @@ fn next_rigid_match<'a>(pattern: &[&CharSet], s: &[&'a RE], i: usize) -> SearchR
 
 /// Search for a match of pattern in sequence s, starting from index i and going down
 /// `pattern` is a rigid pattern represented as a sequence of CharSets
-fn prev_rigid_match<'a>(pattern: &[&CharSet], s: &[&'a RE], i: usize) -> SearchResult {
+fn prev_rigid_match(pattern: &[&CharSet], s: &[&RE], i: usize) -> SearchResult {
     let p_len = pattern.len();
     for j in (p_len..=i).rev() {
         if rigid_match_at(pattern, s, j - p_len) {
@@ -1393,7 +1393,7 @@ impl ReManager {
         fn is_included(r: RegLan, s: RegLan) -> bool {
             let result = sub_language(r, s);
             if result {
-                println!("---> subsumption: {} subsumed by {}", r, s);
+                println!("---> subsumption: {r} subsumed by {s}");
             }
             result
         }
@@ -2351,12 +2351,14 @@ impl<'a> Iterator for DerivativeIterator<'a> {
     }
 }
 
+#[allow(clippy::uninlined_format_args)]
 #[cfg(test)]
 mod tests {
     use crate::smt_strings::char_to_smt;
 
     use super::*;
 
+    #[allow(clippy::uninlined_format_args)]
     fn print_term(name: &str, r: RegLan) {
         println!("term {} = {}", name, r);
         println!("   ptr:       {:p}", r);
@@ -2417,7 +2419,7 @@ mod tests {
         let v2 = build_atoms(re);
 
         for (i, &t) in v1.iter().enumerate() {
-            let name = format!("t{}", i);
+            let name = format!("t{i}");
             print_term(&name, t);
             check_equal(t, v2[i]);
         }
@@ -2431,26 +2433,26 @@ mod tests {
 
         for &t in &v {
             let x = re.star(t);
-            print_term(&format!("star({})", t), x);
+            print_term(&format!("star({t})"), x);
             check_equal(x, re.star(t));
         }
 
         for &t in &v {
             let x = re.plus(t);
-            print_term(&format!("plus({})", t), x);
+            print_term(&format!("plus({t})"), x);
             check_equal(x, re.plus(t));
         }
 
         for &t in &v {
             let x = re.opt(t);
-            print_term(&format!("opt({})", t), x);
+            print_term(&format!("opt({t})"), x);
             check_equal(x, re.opt(t));
         }
 
         for &t in &v {
             for k in 0..3 {
                 let x = re.exp(t, k);
-                print_term(&format!("exp({}, {})", t, k), x);
+                print_term(&format!("exp({t}, {k})"), x);
                 check_equal(x, re.exp(t, k));
             }
         }
@@ -2485,7 +2487,7 @@ mod tests {
         for &t in &v {
             for &u in &v {
                 let x = re.concat(t, u);
-                print_term(&format!("concat({}, {})", t, u), x);
+                print_term(&format!("concat({t}, {u})"), x);
                 check_equal(x, re.concat(t, u));
             }
         }
@@ -2499,7 +2501,7 @@ mod tests {
         for &t in &v {
             for &u in &v {
                 let x = re.inter(t, u);
-                print_term(&format!("inter({}, {})", t, u), x);
+                print_term(&format!("inter({t}, {u})"), x);
                 check_equal(x, re.inter(t, u));
             }
         }
@@ -2513,7 +2515,7 @@ mod tests {
         for &t in &v {
             for &u in &v {
                 let x = re.union(t, u);
-                print_term(&format!("union({}, {})", t, u), x);
+                print_term(&format!("union({t}, {u})"), x);
                 check_equal(x, re.union(t, u));
             }
         }
@@ -2526,11 +2528,11 @@ mod tests {
 
         for &t in &v {
             let x = re.complement(t);
-            print_term(&format!("complement({})", t), x);
+            print_term(&format!("complement({t})"), x);
             check_equal(x, re.complement(t));
 
             let y = re.complement(x);
-            print_term(&format!("complement({})", x), y);
+            print_term(&format!("complement({x})"), y);
             check_equal(y, t);
             check_equal(y, re.complement(x));
         }
@@ -2566,15 +2568,15 @@ mod tests {
         for &t in &v {
             for &u in &v {
                 let x = re.concat(t, u);
-                print_term(&format!("concat({}, {})", t, u), x);
+                print_term(&format!("concat({t}, {u})"), x);
                 check_equal(x, re.concat(t, u));
 
                 let x = re.inter(t, u);
-                print_term(&format!("inter({}, {})", t, u), x);
+                print_term(&format!("inter({t}, {u})"), x);
                 check_equal(x, re.inter(t, u));
 
                 let x = re.union(t, u);
-                print_term(&format!("union({}, {})", t, u), x);
+                print_term(&format!("union({t}, {u})"), x);
                 check_equal(x, re.union(t, u));
             }
         }
@@ -2583,16 +2585,16 @@ mod tests {
     #[test]
     fn test_sub_terms() {
         fn print_sub_terms(t: RegLan) {
-            println!("Base term: {}", t);
+            println!("Base term: {t}");
             println!("Sub terms = [");
             for x in sub_terms(t) {
-                println!("  {}", x);
+                println!("  {x}");
             }
             println!("]");
 
             println!("Leaves = [");
             for leaf in leaves(t) {
-                println!("  {}", leaf);
+                println!("  {leaf}");
             }
             println!("]\n");
         }
@@ -2614,14 +2616,14 @@ mod tests {
         fn show_patterns(r: RegLan) {
             let v = decompose_concat(r);
             let test = base_patterns(&v);
-            println!("Expression: {} ", r);
+            println!("Expression: {r} ");
             println!("   vector:");
             for x in &v {
-                println!("     {}", x);
+                println!("     {x}");
             }
             println!("   base patterns:");
             for x in &test {
-                println!("     {}", x);
+                println!("     {x}");
             }
             println!()
         }
@@ -2651,14 +2653,14 @@ mod tests {
             for c in t.deriv_class.ranges() {
                 let x = re.set_derivative(t, c);
                 match x {
-                    Ok(d) => println!("deriv {} wrt {} = {}", t, c, d),
+                    Ok(d) => println!("deriv {t} wrt {c} = {d}"),
                     Err(e) => panic!("deriv {} wrt {} failed with error {:?}", t, c, e),
                 }
             }
             if !t.deriv_class.empty_complement() {
                 let y = re.class_derivative(t, ClassId::Complement);
                 match y {
-                    Ok(d) => println!("deriv {} wrt CompClass = {}", t, d),
+                    Ok(d) => println!("deriv {t} wrt CompClass = {d}"),
                     Err(e) => panic!("deriv {} wrt CompClass failed with error {:?}", t, e),
                 }
             }
@@ -2667,20 +2669,14 @@ mod tests {
 
     // deriv e w.r.t. 'a', 'b', and 'c' and e's complementary class
     fn show_derivatives(re: &mut ReManager, e: RegLan) {
-        println!("Expression: {}", e);
+        println!("Expression: {e}");
         println!("  deriv classes: {}", e.deriv_class);
         for c in 'a'..='c' {
-            println!(
-                "  deriv({}, {}) = {}",
-                e,
-                c,
-                re.char_derivative(e, c as u32)
-            )
+            println!("  deriv({e}, {c}) = {}", re.char_derivative(e, c as u32))
         }
         if !e.empty_complement() {
             println!(
-                "  deriv({}, CompClass) = {}",
-                e,
+                "  deriv({e}, CompClass) = {}",
                 re.class_derivative(e, ClassId::Complement).unwrap()
             )
         }
@@ -2756,9 +2752,9 @@ mod tests {
     #[test]
     fn test_all_deriv() {
         fn show_derivs(e: RegLan, v: &[RegLan]) {
-            println!("All derivatives of {}", e);
+            println!("All derivatives of {e}");
             for &d in v {
-                println!("   {}", d)
+                println!("   {d}")
             }
             if v.len() == 1 {
                 println!("Total: 1 derivative")
@@ -2814,13 +2810,13 @@ mod tests {
         ];
 
         let e = re.concat_list(a);
-        println!("All derivatives of {}", e);
+        println!("All derivatives of {e}");
         let mut count = 0;
         for r in re.iter_derivatives(e) {
-            println!("  {}", r);
+            println!("  {r}");
             count += 1;
         }
-        println!("Total: {} derivatives", count);
+        println!("Total: {count} derivatives");
     }
 
     #[test]
