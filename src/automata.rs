@@ -492,7 +492,7 @@ impl Display for Automaton {
             }
             if s.has_default_successor() {
                 let d = s.default_successor().unwrap();
-                writeln!(f, "  \u{03B4}({s}, ...) = {d}")?;
+                writeln!(f, "  \u{03B4}({s}, ...) = s{d}")?;
             }
         }
         writeln!(f)?;

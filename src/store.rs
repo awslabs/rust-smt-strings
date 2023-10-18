@@ -162,7 +162,8 @@ mod test_store {
 
     impl PartialOrd for FullNode {
         fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-            self.id.partial_cmp(&other.id)
+            // self.id.partial_cmp(&other.id)
+            Some(self.cmp(other))
         }
     }
 

@@ -137,7 +137,8 @@ impl Eq for RE {}
 /// We have re1 < re2 iff re1.id < re2.id
 impl PartialOrd for RE {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.id.partial_cmp(&other.id)
+        // self.id.partial_cmp(&other.id)
+        Some(self.cmp(other))
     }
 }
 
@@ -986,7 +987,7 @@ fn simplify_set_operation<'a>(v: &mut Vec<&'a RE>, bottom: &'a RE, top: &'a RE) 
             }
             for i in 1..v.len() {
                 let current = v[i];
-                if current.id == previous.id + 1 {
+                if current.id == previous.id + 1 && previous.id % 2 == 0 {
                     // current is the complement of previous
                     set_to_singleton(v, top);
                     return;
@@ -3024,5 +3025,27 @@ mod tests {
         let test2 = re.try_compile(e, 47);
         assert!(test2.is_some());
         assert_eq!(test2.unwrap().num_states(), 47);
+    }
+
+    #[test]
+    fn test_compile4() {
+        let re = &mut ReManager::new();
+
+        // bb([0-9]+)
+        let bb = re.str(&"bb".into());
+        let digits = re.range('0' as u32, '9' as u32);
+        let digits = re.plus(digits);
+        let first = re.concat(bb, digits);
+
+        // \sigma^[0..4]
+        let sigma = re.all_chars();
+        let lop = re.smt_loop(sigma, 0, 4);
+        let second = re.complement(lop);
+
+        let to_compile = re.inter(second, first);
+
+        let test1 = re.try_compile(to_compile, 10000);
+        assert!(test1.is_some());
+        assert!(test1.unwrap().accepts(&"bb01234".into()));
     }
 }
