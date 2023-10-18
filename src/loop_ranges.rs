@@ -137,6 +137,11 @@ impl LoopRange {
         matches!(self, LoopRange(0, None))
     }
 
+    /// Check whether this range is [1, +infinity]
+    pub fn is_all_positive(&self) -> bool {
+        matches!(self, LoopRange(1, None))
+    }
+
     /// Start of the range
     pub fn start(&self) -> u32 {
         self.0

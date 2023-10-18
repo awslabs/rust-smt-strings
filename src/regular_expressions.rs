@@ -215,6 +215,15 @@ impl BaseRegLan {
         }
     }
 
+    /// Check whether this RE is sigma^+ (all non-empty words)
+    fn is_all_nonempty_words(&self) -> bool {
+        if let BaseRegLan::Loop(r, range) = self {
+            range.is_all_positive() && r.expr.is_all_chars()
+        } else {
+            false
+        }
+    }
+
     /// Check whether this regular expression is of the form (str.to_re <some string>)
     /// This holds if the RE is epsilon or if it's a concatenation of characters
     fn is_singleton(&self) -> bool {
@@ -952,6 +961,23 @@ fn sub_language<'a>(r: &'a RE, s: &'a RE) -> bool {
 }
 
 ///
+/// For debugging: check whether a == complement b
+///
+fn is_complement(a: &RE, b: &RE) -> bool {
+    match b.expr {
+        BaseRegLan::Empty => a.expr.is_full(),
+        BaseRegLan::Epsilon => a.expr.is_all_nonempty_words(),
+        _ => {
+            if let BaseRegLan::Complement(x) = a.expr {
+                x == b
+            } else {
+                false
+            }
+        }
+    }
+}
+
+///
 /// Simplify a vector for building unions or intersections of languages
 /// - v = a vector of languages
 /// - bottom = neutral element
@@ -989,6 +1015,7 @@ fn simplify_set_operation<'a>(v: &mut Vec<&'a RE>, bottom: &'a RE, top: &'a RE) 
                 let current = v[i];
                 if current.id == previous.id + 1 && previous.id % 2 == 0 {
                     // current is the complement of previous
+                    debug_assert!(is_complement(current, previous));
                     set_to_singleton(v, top);
                     return;
                 }
@@ -1102,7 +1129,7 @@ impl ReManager {
                 if x.id == i {
                     // new term
                     let y = self.store.make(BaseRegLan::Complement(x));
-                    debug_assert!(y.id == i + 1);
+                    debug_assert!(y.id == i + 1 && y.id == i ^ 1);
                     self.id2re.push(x);
                     self.id2re.push(y);
                 }
