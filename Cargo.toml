@@ -1,6 +1,6 @@
 [package]
 name = "aws-smt-strings"
-version = "0.2.0"
+version = "0.3.0"
 description = "A library for manipulating SMT-LIB strings and regular expressions"
 repository = "https://github.com/awslabs/rust-smt-strings"
 authors = ["Bruno Dutertre <dutebrun@amazon.com>"]
