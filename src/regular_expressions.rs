@@ -2240,11 +2240,9 @@ impl ReManager {
                 if state_count == max_states {
                     return None;
                 }
-                println!("... derivatives of {e}");
                 state_count += 1;
                 for set in e.char_ranges() {
                     let d = self.set_derivative_unchecked(e, set);
-                    println!("      deriv({e}, {set}) = {d}");
                     queue.push(d);
                     builder.add_transition(&e.expr, set, &d.expr);
                 }
@@ -2257,7 +2255,6 @@ impl ReManager {
                     builder.mark_final(&e.expr);
                 }
             }
-            println!("... state count = {state_count}");
             Some(builder.build_unchecked())
         }
     }
@@ -3090,5 +3087,9 @@ mod tests {
         assert!(test.is_some());
         let dfa = test.unwrap();
         println!("Resulting automaton: {dfa}");
+
+        assert!(dfa.accepts(&"aaaaaaaaaa".into()));
+        assert!(! dfa.accepts(&"aaaaa".into()));
+        assert!(! dfa.accepts(&"aa".into()));
     }
 }
