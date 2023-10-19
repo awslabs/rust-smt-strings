@@ -333,11 +333,12 @@ impl LoopRange {
         //
         // So K is the union of the intervals [y * a, y * b] for y = c to d.
         //
-        //
         // If c == d then K is an interval since then K=[c * a, c * b].
         //
-        // If a == 0 and b == 0, the product is exact (equal to K = [0, 0]) no
-        // matter c and d.
+        // If b == +infinity then there are two cases:
+        // 1) c == 0, then K = is [0, 0] \union [a, +infinity]
+        //    K is an interval if a <= 1
+        // 2) c > 0 then K is the interval [c * a, +infinity]
         //
         // Otherwise, K is an interval if there's no gap between
         // subsequent intervals [y*a, y*b] and [(y+1)*a, (y+1)*b].
