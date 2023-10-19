@@ -3089,7 +3089,7 @@ mod tests {
         println!("Resulting automaton: {dfa}");
 
         assert!(dfa.accepts(&"aaaaaaaaaa".into()));
-        assert!(! dfa.accepts(&"aaaaa".into()));
-        assert!(! dfa.accepts(&"aa".into()));
+        assert!(!dfa.accepts(&"aaaaa".into()));
+        assert!(!dfa.accepts(&"aa".into()));
     }
 }
