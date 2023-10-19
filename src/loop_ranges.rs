@@ -291,12 +291,15 @@ impl LoopRange {
     ///
     ///    `r.right_mul_is_exact(s)`
     ///
-    /// returns true if the Union(k * [a, b]) for k in s is equal [a, b] * [c, d].
+    /// returns true if the Union(k * [a, b]) for k in s is equal to [a, b] * [c, d].
     ///
     /// If it is, we can rewrite `(loop (loop L a b) c d)` to `(loop L a * c b * d)`.
     ///
-    /// **Note**: the product of two ranges is commutative but this method
-    /// is not. For example:
+    /// **Note**:
+    ///
+    /// The product of two ranges is commutative but this method is not.
+    /// For example:
+    ///
     /// 1) Union(k * [0, +infinity], k in [2, 2]) = 2 * [0, +infinity] = [0, +infinity]
     ///    so
     ///
@@ -333,10 +336,8 @@ impl LoopRange {
         //
         // If c == d then K is an interval since then K=[c * a, c * b].
         //
-        // If b == +infinity then there are two cases:
-        // 1) c == 0, then K = is [0, 0] \union [a, +infinity]
-        //    K is an interval if a <= 1
-        // 2) c > 0 then K is the interval [c * a, +infinity]
+        // If a == 0 and b == 0, the product is exact (equal to K = [0, 0]) no
+        // matter c and d.
         //
         // Otherwise, K is an interval if there's no gap between
         // subsequent intervals [y*a, y*b] and [(y+1)*a, (y+1)*b].
