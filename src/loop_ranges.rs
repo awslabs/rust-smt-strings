@@ -153,20 +153,6 @@ impl LoopRange {
         self.1.unwrap()
     }
 
-    /// Size of the range.
-    ///
-    /// - For a finite range [i, j], the size is the number of of integers
-    /// in the interval [i, j] (i.e., j - i + 1).
-    /// - For an infinite range, the size is not defined,
-    ///
-    /// # Panics
-    ///
-    /// If the range is infinite.
-    fn size(&self) -> u32 {
-        debug_assert!(self.is_finite());
-        self.1.unwrap() - self.0 + 1
-    }
-
     ///
     /// Check whether an index is in a loop range
     ///
@@ -232,9 +218,11 @@ impl LoopRange {
     ///   k is not zero, return [k * i, +infinity]
     /// - If k is zero, return [0, 0] even if the current range is infinite
     ///
+    /// This corresponds to adding [i, j] to itself k times.
+    ///
     /// This can be used to rewrite
     ///
-    ///   `(loop L i j)^k` = `(loop L k * i k * j)`
+    ///   `(loop L i j)^k` = `(loop L (k * i) (k * j))`
     ///
     /// # Panics
     ///
@@ -335,9 +323,15 @@ impl LoopRange {
         // Explanation:
         // let self = [a, b] and other = [c, d].
         // let K = { x * y | a <= x <= b and c <= y <= d}
-        // then K = Union( [y * a, y * b] for y=c to d).
+        // then K = Union( y * [a, b] for y = c to d ).
         //
-        // IF c == d then K is an interval since then K=[c*a, c*b].
+        // In this, y * [a, b] is the sum of y integers, all taken in the
+        // interval [a, b]. So y * [a, b] is equal to [y * a, y * b].
+        //
+        // So K is the union of the intervals [y * a, y * b] for y = c to d.
+        //
+        //
+        // If c == d then K is an interval since then K=[c * a, c * b].
         //
         // If b == +infinity then there are two cases:
         // 1) c == 0, then K = is [0, 0] \union [a, +infinity]
@@ -349,13 +343,17 @@ impl LoopRange {
         // There's a gap iff (y+1)*a - y*b > 1, which is equivalent
         //   to y * (b - a) + 1 < a.
         // So no gap for y is y * (b - a) + 1 >= a.
+        //
         // This condition holds for all y in [c, d] iff it holds when y = c.
         //
         other.is_point()
             || if self.is_infinite() {
                 other.start() > 0 || self.start() <= 1
             } else {
-                mul32(other.start(), self.size()) + 1 >= self.start()
+                // c = other.start()
+                // b = self.end()
+                // a = self.start()
+                mul32(other.start(), self.end() - self.start()) + 1 >= self.start()
             }
     }
 
@@ -391,6 +389,7 @@ mod test {
             LoopRange::infinite(3),
             LoopRange::infinite(20),
             LoopRange::point(0),
+            LoopRange::point(1),
             LoopRange::point(2),
             LoopRange::point(5),
             LoopRange::opt(),
