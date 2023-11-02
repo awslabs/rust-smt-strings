@@ -2461,6 +2461,7 @@ mod tests {
         let a = re.all_chars();
         let a2 = re.exp(a, 2);
         let a2_star = re.star(a2);
+        let a2_plus = re.plus(a2);
         let a_star = re.star(a);
         let a_plus = re.plus(a);
         let a_star2 = re.exp(a_star, 2);
@@ -2468,13 +2469,16 @@ mod tests {
         let a_plus_star = re.star(a_plus);
         let a_star_plus = re.plus(a_star);
         print_term("(Sigma^2)^*", a2_star);
+        print_term("(Sigma^2)^+", a2_plus);
         print_term("(Sigma^*)^2", a_star2);
         print_term("(Sigma^*)^*", a_star_star);
         print_term("(Sigma^*)^+)", a_star_plus);
         print_term("(Sigma^+)^*", a_plus_star);
 
-        //        assert_eq!(a_star2, a_star);
+        assert_eq!(a_star2, a_star);
         assert_ne!(a2_star, a_star);
+        assert_ne!(a2_star, a2_plus);
+        assert_ne!(a2_plus, a_star);
         assert_eq!(a_plus_star, a_star);
         assert_eq!(a_star_plus, a_star);
         assert_eq!(a_star_star, a_star);

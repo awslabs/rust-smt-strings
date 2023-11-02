@@ -48,7 +48,7 @@ pub fn naive_search(pattern: &[u32], string: &[u32], k: usize) -> SearchResult {
 /// Search for the first occurrence of a regular expression in a string starting from index k
 /// - If allow_empty is true, an empty string may be returned (if the pattern contains the
 ///   empty string)
-/// - The index k must be less than sting.len()
+/// - The index k must be less than string.len()
 ///
 /// - Return NotFound if pattern does not occur in string[k ... len(string) - 1]
 /// - Return Found(i, j) if string[i ... j-1] matches the pattern

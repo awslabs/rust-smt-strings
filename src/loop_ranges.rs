@@ -325,8 +325,7 @@ impl LoopRange {
         //
         // Explanation:
         // let self = [a, b] and other = [c, d].
-        // let K = { x * y | a <= x <= b and c <= y <= d}
-        // then K = Union( y * [a, b] for y = c to d ).
+        // let K = Union( y * [a, b] for y = c to d ).
         //
         // In this, y * [a, b] is the sum of y integers, all taken in the
         // interval [a, b]. So y * [a, b] is equal to [y * a, y * b].
@@ -472,5 +471,42 @@ mod test {
             }
         }
         println!()
+    }
+
+    #[test]
+    fn test_mul_exact() {
+        let v = [
+            LoopRange::point(2),
+            LoopRange::finite(2, 3),
+            LoopRange::infinite(2),
+        ];
+
+        // r^3 is an interval for any r
+        for r in &v {
+            assert!(r.right_mul_is_exact(&LoopRange::point(3)));
+        }
+
+        let opt = LoopRange::opt();
+        let star = LoopRange::opt();
+        let plus = LoopRange::plus();
+
+        // all example r contain integers >= 2
+        // r^opt and r^* contain 0 and integers >= 2
+        // so r^opt and r^* are not intervals
+        for r in &v {
+            assert!(!r.right_mul_is_exact(&opt));
+            assert!(!r.right_mul_is_exact(&star));
+        }
+
+        // 2^+ = { 2, 4, ...} : not an interval
+        assert!(!v[0].right_mul_is_exact(&plus));
+        // [2,3]^+ = [2, inf): interval
+        assert!(v[1].right_mul_is_exact(&plus));
+        // [2, inf^)+ = [2, inf): interval
+        assert!(v[2].right_mul_is_exact(&plus));
+
+        // plus^opt is star
+        // star^opt is star
+        // opt^opt is opt
     }
 }
