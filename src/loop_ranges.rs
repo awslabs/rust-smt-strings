@@ -343,7 +343,7 @@ impl LoopRange {
         // subsequent intervals [y*a, y*b] and [(y+1)*a, (y+1)*b].
         // There's a gap iff (y+1)*a - y*b > 1, which is equivalent
         //   to y * (b - a) + 1 < a.
-        // So no gap for y is y * (b - a) + 1 >= a.
+        // So no gap for y is y * (b - a) >= a - 1.
         //
         // This condition holds for all y in [c, d] iff it holds when y = c.
         //
@@ -354,7 +354,7 @@ impl LoopRange {
                 // c = other.start()
                 // b = self.end()
                 // a = self.start()
-                mul32(other.start(), self.end() - self.start()) + 1 >= self.start()
+                mul32(other.start(), self.end() - self.start()) >= self.start().saturating_sub(1)
             }
     }
 
@@ -487,7 +487,7 @@ mod test {
         }
 
         let opt = LoopRange::opt();
-        let star = LoopRange::opt();
+        let star = LoopRange::star();
         let plus = LoopRange::plus();
 
         // all example r contain integers >= 2
@@ -506,7 +506,13 @@ mod test {
         assert!(v[2].right_mul_is_exact(&plus));
 
         // plus^opt is star
+        assert!(plus.right_mul_is_exact(&opt));
+        assert_eq!(plus.mul(&opt), star);
         // star^opt is star
+        assert!(star.right_mul_is_exact(&opt));
+        assert_eq!(star.mul(&opt), star);
         // opt^opt is opt
+        assert!(opt.right_mul_is_exact(&opt));
+        assert_eq!(opt.mul(&opt), opt);
     }
 }
