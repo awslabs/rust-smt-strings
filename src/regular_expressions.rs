@@ -768,7 +768,8 @@ fn rigid_suffix_match<'a>(u: &[&'a RE], v: &[&'a RE], p: &BasePattern) -> bool {
 /// - `u` is a sequence/concatenation of REs
 /// - 'v' and 'patterns' define a sequence of rigid patterns
 /// - return true if all patterns defined by 'v' and 'patterns' are matched by
-///    successive, disjoint sub-sequences of `u`
+///   successive, disjoint sub-sequences of `u`
+///
 /// This version does a left-to-right search in `u'
 #[allow(clippy::many_single_char_names)]
 fn find_rigid_matches<'a>(u: &[&'a RE], v: &[&'a RE], patterns: &mut [BasePattern]) -> bool {

@@ -25,6 +25,7 @@ pub enum Edge<T, L> {
 /// Labeled queue to explore a graph from a root
 /// - T: type of nodes
 /// - L: type of labels
+///
 /// For every node N that's been visited (except the root), we keep
 /// a pair (label, predecessor), where the predecessor is a node
 /// on a path from the root to N.
@@ -182,7 +183,8 @@ impl<T: Eq + Hash + Clone, L: Clone> LabeledQueue<T, L> {
     ///        edge of label l<sub>i</sub>.
     ///     3) destination is reachable from n<sub>k</sub> via an
     ///        edge of label l<sub>k</sub>
-    ///  Note: the destination node is not included in this list.
+    ///
+    /// Note: the destination node is not included in this list.
     ///
     pub fn full_path(&self, destination: &T) -> Option<Vec<(T, L)>> {
         self.map.get(destination).map(|e| self.make_path(e))

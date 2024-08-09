@@ -35,10 +35,10 @@
 //! Partitions are used to decompose the SMT-LIB alphabet (of 196608 characters) into a typically much smaller number
 //! of equivalent classes.
 //! - For regular expressions, a partition divides the alphabet into derivative classes.
-//! See [ReManager](crate::regular_expressions::ReManager).
+//!   See [ReManager](crate::regular_expressions::ReManager).
 //! - For a finite-state automaton, a partition divides the alphabet into classes that have the
-//! same transitions. A character partition is attached to every state `s` in an automaton and the successors
-//! of `s` are defined for every class in this partition. See [Automaton](crate::automata::Automaton).
+//!   same transitions. A character partition is attached to every state `s` in an automaton and the successors
+//!   of `s` are defined for every class in this partition. See [Automaton](crate::automata::Automaton).
 //!
 
 use std::{

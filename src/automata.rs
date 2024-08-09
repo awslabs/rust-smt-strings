@@ -437,6 +437,7 @@ impl State {
 
     /// Apply remapping to a state and return the updated state
     /// - `self` must be a state to keep as defined by remap
+    ///
     /// This operation is destructive:
     /// - self.classes is modified (replaced by an empty partition)
     /// - self.successors is lost too.

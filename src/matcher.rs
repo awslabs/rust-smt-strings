@@ -25,7 +25,7 @@ pub enum SearchResult {
 ///
 /// - Return NotFound if pattern does not occur in string[k ... len(string) - 1]
 /// - Return Found(i, j) if string[i ... j-1] equals pattern (so j = i+len(pattern))
-/// and i is the smallest index >= k that satisfies these conditions
+///   and i is the smallest index >= k that satisfies these conditions
 ///
 pub fn naive_search(pattern: &[u32], string: &[u32], k: usize) -> SearchResult {
     let p_len = pattern.len();
