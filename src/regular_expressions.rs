@@ -698,7 +698,7 @@ fn next_rigid_match(pattern: &[&CharSet], s: &[&RE], i: usize) -> SearchResult {
     let p_len = pattern.len();
     let s_len = s.len();
     if s_len >= p_len {
-        for j in i..(s_len - p_len) {
+        for j in i..=(s_len - p_len) {
             if rigid_match_at(pattern, s, j) {
                 return SearchResult::Found(j, j + p_len);
             }
