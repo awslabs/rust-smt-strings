@@ -462,7 +462,7 @@ impl Iterator for ReIterator {
     /// List all sub-terms in breadth-first order, without duplicates
     fn next(&mut self) -> Option<Self::Item> {
         fn get_next(queue: &mut BfsQueue<RegLan>) -> Option<RegLan> {
-            queue.pop().map(|x| {
+            queue.pop().inspect(|x| {
                 match x.expr {
                     BaseRegLan::Concat(left, right) => {
                         queue.push(left);
@@ -482,7 +482,6 @@ impl Iterator for ReIterator {
                     }
                     _ => (),
                 }
-                x
             })
         }
 
