@@ -97,7 +97,7 @@ pub type RegLan = &'static RE;
 ///
 /// The derivative classes are disjoint interval characters that cover
 /// a subset of the alphabet, and a complementary class that covers the rest.
-/// See [CharPartition][crate::character_sets::CharPartition]. The `deriv_class` partition is
+/// See [CharPartition]. The `deriv_class` partition is
 /// constructed to ensure that all the characters in a class produce the same
 /// derivative of e: if c1 and c2 are in the same derivative class of e then
 /// deriv(e, c1) and deriv(e, c2) are equal.
@@ -1995,7 +1995,7 @@ impl ReManager {
     /// The derivative with respect to c is well defined either if c is included in a
     /// derivative class of e or if c is included in the complementary class.
     /// If these conditions do not hold, the method return Err([Error::UndefinedDerivative]).
-    /// See [Error][crate::errors::Error].
+    /// See [Error].
     ///
     /// # Example
     /// ```
