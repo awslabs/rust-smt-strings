@@ -40,6 +40,5 @@ mod fast_sets;
 mod labeled_queues;
 mod matcher;
 mod minimizer;
-mod new_store;
 mod partitions;
 mod store;
