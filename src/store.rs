@@ -17,7 +17,7 @@ use std::{
 ///
 /// Key is a key/signature type for the hash-consed objects.
 /// Each key must be unique to the object.
-/// make(&k) must construct a full object of key k
+/// make(i, &k) must construct a full object of key k. i is the id of this new object.
 ///
 pub trait HashConsed {
     /// Key type

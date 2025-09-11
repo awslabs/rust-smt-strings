@@ -189,8 +189,8 @@ impl BasePartition {
     ///
     /// Refine a block according to a predicate p
     /// - split block i into to sub-blocks B1 and B2
-    ///     B1 = { x in block i | p(x) }
-    ///     B2 = { x in block i | not p(x) }
+    ///   B1 = { x in block i | p(x) }
+    ///   B2 = { x in block i | not p(x) }
     /// - if B1 or B2 is empty, block i is unchanged
     /// - otherwise split block i:
     ///   - elements of block i that satisfy p remain in the block
@@ -317,8 +317,8 @@ impl Partition {
     ///
     /// Refine a block according to a predicate p
     /// - split block i into to sub-blocks B1 and B2
-    ///     B1 = { x in block i | p(x) }
-    ///     B2 = { x in block i | not p(x) }
+    ///   B1 = { x in block i | p(x) }
+    ///   B2 = { x in block i | not p(x) }
     /// - if B1 or B2 is empty, nothing changes
     /// - otherwise split block i:
     ///   - elements of block i that satisfy p remain in the block
@@ -348,8 +348,8 @@ impl Partition {
     /// - f must be defined on the partition elements (i.e., if the partition
     ///   has size N, f must be a map from [0 .. N-1] to [0 .. N-1]).
     /// - split block i into two sub-blocks B1 and B2
-    ///    B1 = { y in block i | f(y) in b }
-    ///    B2 = { y in block i | f(y) not in b }
+    ///   B1 = { y in block i | f(y) in b }
+    ///   B2 = { y in block i | f(y) not in b }
     /// - the result is as in [refine_block](Self::refine_block)
     ///
     /// Warning: if i == b, this may modify block B.

@@ -462,26 +462,24 @@ impl Iterator for ReIterator {
     /// List all sub-terms in breadth-first order, without duplicates
     fn next(&mut self) -> Option<Self::Item> {
         fn get_next(queue: &mut BfsQueue<RegLan>) -> Option<RegLan> {
-            queue.pop().inspect(|x| {
-                match x.expr {
-                    BaseRegLan::Concat(left, right) => {
-                        queue.push(left);
-                        queue.push(right);
-                    }
-                    BaseRegLan::Loop(x, _) => {
-                        queue.push(x);
-                    }
-                    BaseRegLan::Complement(x) => {
-                        queue.push(x);
-                    }
-                    BaseRegLan::Inter(ref list) => {
-                        queue.push_all(list.iter().copied());
-                    }
-                    BaseRegLan::Union(ref list) => {
-                        queue.push_all(list.iter().copied());
-                    }
-                    _ => (),
+            queue.pop().inspect(|x| match x.expr {
+                BaseRegLan::Concat(left, right) => {
+                    queue.push(left);
+                    queue.push(right);
                 }
+                BaseRegLan::Loop(x, _) => {
+                    queue.push(x);
+                }
+                BaseRegLan::Complement(x) => {
+                    queue.push(x);
+                }
+                BaseRegLan::Inter(ref list) => {
+                    queue.push_all(list.iter().copied());
+                }
+                BaseRegLan::Union(ref list) => {
+                    queue.push_all(list.iter().copied());
+                }
+                _ => (),
             })
         }
 
@@ -613,7 +611,6 @@ fn set_to_singleton<'a>(a: &mut Vec<&'a RE>, x: &'a RE) {
 /// - second pass: the parts of S that are not matched in the first pass must now match
 ///   flexible patterns of R in sequence.
 ///
-
 /// Data structure to represent a basic pattern of array R of RegLan
 /// - start and end are indices in R such that start < end
 /// - this means that R[start, end-1] is a base pattern
@@ -735,9 +732,9 @@ fn char_sets_of_pattern<'a>(p: &[&'a RE]) -> Vec<&'a CharSet> {
 
 /// Check whether a concatenation of REs starts with a rigid pattern
 /// - 'u' is a sequence of REs (concatenated)
-/// - 'v' and 'p' define the pattern to search for:
-///    `p` identifies a slice of 'v' (from p.start to p.end)
-///    this slice is a concatenation of Range expressions
+/// - 'v' and 'p' define the pattern to search for.
+///   `p` identifies a slice of 'v' (from p.start to p.end)
+///   this slice is a concatenation of Range expressions
 /// - return true if 'u' starts with a sequence of Range expressions
 ///   of the same length as the pattern and that each range expression in `u` is
 ///   included in the corresponding range expression in the pattern.
