@@ -2161,6 +2161,43 @@ impl ReManager {
         self.iter_derivatives(e).all(|x| !x.nullable)
     }
 
+    /// Check whether a regular expression is empty, with bounded derivative exploration
+    ///
+    /// This is a resource-bounded version of [`is_empty_re`](Self::is_empty_re) that limits the
+    /// number of derivatives computed to avoid potentially expensive operations.
+    ///
+    /// # Returns
+    /// - `None` if the derivative limit was reached before determining emptiness, otherwise
+    /// - `Some(true)` if the language is empty
+    /// - `Some(false)` if the language is non-empty
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use aws_smt_strings::regular_expressions::*;
+    /// let mut re = ReManager::new();
+    /// let abc = re.str(&"abc".into());
+    /// let def = re.str(&"def".into());
+    /// let intersection = re.inter(abc, def);
+    ///
+    /// let small_bound_result = re.is_empty_re_bounded(intersection, 1);
+    /// assert_eq!(small_bound_result, None);
+    ///
+    /// let result = re.is_empty_re_bounded(intersection, 3);
+    /// assert_eq!(result, Some(true));
+    /// ```
+    pub fn is_empty_re_bounded(&mut self, e: RegLan, max_derivatives: usize) -> Option<bool> {
+        for (count, d) in self.iter_derivatives(e).enumerate() {
+            if count >= max_derivatives {
+                return None;
+            }
+            if d.nullable {
+                return Some(false);
+            }
+        }
+        Some(true)
+    }
+
     ///
     /// Search for a symbolic string of e
     /// - the result is None, if e is an empty regular expression.
@@ -2882,6 +2919,44 @@ mod tests {
         let sample = re.get_string(test);
         assert!(sample.is_some());
         println!("Sample string in {}: {}", test, sample.unwrap());
+    }
+
+    #[test]
+    fn test_empty_check_bounded() {
+        let re = &mut ReManager::new();
+
+        let full = re.full();
+        let abcd = re.str(&"abcd".into());
+        let bc = re.str(&"bc".into());
+
+        let a = re.concat(abcd, full); // strings that start with 'abcd'
+        let b = re.concat_list([full, bc, full]); // strings that contain 'bc'
+
+        let test = re.diff(a, b); // strings that start with 'abcd' but don't contain 'bc'
+        let derivatives_count = re.iter_derivatives(test).count();
+
+        assert_eq!(re.is_empty_re_bounded(test, derivatives_count - 1), None);
+        assert_eq!(re.is_empty_re_bounded(test, derivatives_count), Some(true));
+    }
+
+    #[test]
+    fn test_empty_check_bounded_2() {
+        let re = &mut ReManager::new();
+
+        let c1 = [
+            re.all_chars(),
+            re.all_chars(),
+            re.full(),
+            re.str(&"/abcd/".into()),
+            re.all_chars(),
+            re.str(&"/end".into()),
+        ];
+
+        let e1 = re.concat_list(c1);
+        let derivatives_count = re.iter_derivatives(e1).count();
+
+        assert_eq!(re.is_empty_re_bounded(e1, derivatives_count - 1), None);
+        assert_eq!(re.is_empty_re_bounded(e1, derivatives_count), Some(false));
     }
 
     #[test]
