@@ -984,7 +984,7 @@ fn simplify_set_operation<'a>(v: &mut Vec<&'a RE>, bottom: &'a RE, top: &'a RE) 
             }
             for i in 1..v.len() {
                 let current = v[i];
-                if current.id == previous.id + 1 && previous.id % 2 == 0 {
+                if current.id == previous.id + 1 && previous.id.is_multiple_of(2) {
                     // current is the complement of previous
                     set_to_singleton(v, top);
                     return;
