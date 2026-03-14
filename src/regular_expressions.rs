@@ -1397,7 +1397,7 @@ impl ReManager {
         }
 
         // we skip the subsumption check when x == r
-        // this works since there are no duplicates in a
+        // this works since there are no duplicates in `a`
         fn is_subsumed(r: RegLan, a: &[RegLan]) -> bool {
             // a.iter().any(|&x| x != r && is_included(r, x))
             a.iter().any(|&x| x != r && sub_language(r, x))
@@ -2289,7 +2289,9 @@ impl ReManager {
                     builder.mark_final(&e.expr);
                 }
             }
-            Some(builder.build_unchecked())
+            let mut automaton = builder.build_unchecked();
+            automaton.minimize();
+            Some(automaton)
         }
     }
 
@@ -3167,5 +3169,36 @@ mod tests {
         assert!(dfa.accepts(&"aaaaaaaaaa".into()));
         assert!(!dfa.accepts(&"aaaaa".into()));
         assert!(!dfa.accepts(&"aa".into()));
+    }
+
+    #[test]
+    fn test_compile7() {
+        let re = &mut ReManager::new();
+
+        // ab+ \inter ca+
+        let a = re.char('a' as u32);
+        let b = re.char('b' as u32);
+        let c = re.char('c' as u32);
+
+        let b_plus = re.plus(b);
+        let ab_plus = re.concat(a, b_plus); // ab+
+        let a_plus = re.plus(a);
+        let ca_plus = re.concat(c, a_plus); // ca+
+
+        let inter = re.inter(ab_plus, ca_plus);
+        println!("testing {inter}");
+        let test = re.try_compile(inter, 10000);
+        assert!(test.is_some());
+        let dfa = test.unwrap();
+        println!("Resulting automaton: {dfa}");
+
+        // ab+ starts with 'a', ca+ starts with 'c' => intersection is empty
+        assert!(!dfa.accepts(&"ab".into()));
+        assert!(!dfa.accepts(&"abbb".into()));
+        assert!(!dfa.accepts(&"ca".into()));
+        assert!(!dfa.accepts(&"caaa".into()));
+        assert!(!dfa.accepts(&"".into()));
+        assert!(!dfa.accepts(&"a".into()));
+        assert!(!dfa.accepts(&"abc".into()));
     }
 }

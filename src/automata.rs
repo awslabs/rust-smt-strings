@@ -1019,4 +1019,63 @@ mod test {
         );
         println!("{automaton}");
     }
+
+    #[test]
+    fn test_minimizer_no_final_states() {
+        let builder = &mut AutomatonBuilder::new(&0);
+
+        // Same structure as test_minimizer but no states are marked final.
+        // Without final/non-final distinction, states 3, 4, 5 and 0, 1, 2
+        // can be collapsed more aggressively.
+        builder.add_transition(&0, &CharSet::singleton('a' as u32), &1);
+        builder.add_transition(&1, &CharSet::singleton('b' as u32), &2);
+        builder.add_transition(&2, &CharSet::singleton('c' as u32), &3);
+
+        builder.add_transition(&3, &CharSet::singleton('a' as u32), &4);
+        builder.add_transition(&4, &CharSet::singleton('a' as u32), &5);
+        builder.add_transition(&5, &CharSet::singleton('a' as u32), &3);
+
+        builder.set_default_successor(&0, &6);
+        builder.set_default_successor(&1, &7);
+        builder.set_default_successor(&2, &7);
+        builder.set_default_successor(&3, &8);
+        builder.set_default_successor(&4, &6);
+        builder.set_default_successor(&5, &7);
+
+        builder.set_default_successor(&6, &7);
+        builder.set_default_successor(&7, &8);
+        builder.set_default_successor(&8, &6);
+
+        let automaton = &mut builder.build().unwrap();
+
+        println!(
+            "No-final-states automaton: {} states, initial state: {}",
+            automaton.num_states(),
+            automaton.initial_state()
+        );
+        println!("{automaton}");
+
+        automaton.test_minimizer();
+
+        automaton.minimize();
+        println!(
+            "\nAfter minimization: {} states, initial state: {}",
+            automaton.num_states(),
+            automaton.initial_state(),
+        );
+        println!("{automaton}");
+
+        // The minimized automaton should have exactly one state
+        assert_eq!(automaton.num_states(), 1);
+        // No final states
+        assert_eq!(automaton.num_final_states(), 0);
+        // The single state is not final
+        let s0 = automaton.initial_state();
+        assert!(!s0.is_final());
+        // All transitions loop back to s0
+        assert_eq!(automaton.next(s0, 'a' as u32).id(), s0.id());
+        assert_eq!(automaton.next(s0, 'b' as u32).id(), s0.id());
+        assert_eq!(automaton.next(s0, 'c' as u32).id(), s0.id());
+        assert_eq!(automaton.next(s0, 'z' as u32).id(), s0.id());
+    }
 }
