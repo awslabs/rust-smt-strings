@@ -1009,6 +1009,31 @@ fn simplify_set_operation<'a>(v: &mut Vec<&'a RE>, bottom: &'a RE, top: &'a RE) 
 #[derive(Debug, PartialEq, Eq, Hash)]
 struct DerivKey(RegLan, ClassId);
 
+///
+/// Result of bounded path search or string search
+///
+#[derive(Debug)]
+pub enum BoundedSearch<T> {
+    /// the search failed because the bound was reached.
+    Failed,
+    /// the search failed because the regular expression is empty
+    Empty,
+    /// found some object T
+    Some(T),
+}
+
+//
+// Convert Option<T> to BoundedSearch<T>
+//
+impl<T> From<Option<T>> for BoundedSearch<T> {
+    fn from(value: Option<T>) -> Self {
+        match value {
+            None => BoundedSearch::Empty,
+            Some(x) => BoundedSearch::Some(x),
+        }
+    }
+}
+
 /// A store for constructing regular expressions using hash-consing.
 ///
 /// The store ensures that each regular expression has a unique integer id.
@@ -1144,7 +1169,7 @@ impl ReManager {
         self.sigma_star
     }
 
-    /// The RE that contains only the empty string
+    /// The regular expression that contains only the empty string
     ///
     /// # Example
     ///
@@ -1163,7 +1188,7 @@ impl ReManager {
         self.epsilon
     }
 
-    /// The RE that contains all non-empty strings
+    /// The regular expression that contains all non-empty strings
     ///
     /// This is the complement of [epsilon](Self::epsilon).
     ///
@@ -2207,11 +2232,19 @@ impl ReManager {
     ///      of r w.r.t. cid is nullable.
     /// - the list is empty if e itself is nullable (this represents the empty string)
     ///
-    fn get_string_path(&mut self, e: RegLan) -> Option<Vec<(RegLan, ClassId)>> {
+    fn get_string_path(
+        &mut self,
+        e: RegLan,
+        max_derivatives: usize,
+    ) -> BoundedSearch<Vec<(RegLan, ClassId)>> {
         let mut queue: LabeledQueue<RegLan, ClassId> = LabeledQueue::new(e);
+        let mut deriv_count = 0;
         while let Some(r) = queue.pop() {
+            deriv_count += 1;
             if r.nullable {
-                return queue.full_path(&r);
+                return queue.full_path(&r).into();
+            } else if deriv_count >= max_derivatives {
+                return BoundedSearch::Failed;
             } else {
                 for cid in r.class_ids() {
                     let d = self.class_derivative_unchecked(r, cid);
@@ -2219,13 +2252,65 @@ impl ReManager {
                 }
             }
         }
-        None
+        BoundedSearch::Empty
+    }
+
+    ///
+    /// Try to get a string that belongs to a regular expression `e`, with a bound on
+    /// the number of derivatives constructed. This is a resource-bounded variant of
+    /// [`get_string`](Self::get_string).
+    ///
+    /// # Returns
+    ///
+    /// - Failed if the bound was reached
+    /// - Empty if the regular expression `e` can be shown to be empty within the given bound
+    /// - Some(s) where `s` is a string that belongs to regular expression `e`.
+    ///
+    /// # Example
+    /// ```
+    /// use aws_smt_strings::{regular_expressions::*, smt_strings::*};
+    ///
+    /// let re = &mut ReManager::new();
+    ///
+    /// let ab = re.str(&SmtString::from("ab"));
+    /// let e = re.exp(ab, 20);
+    ///
+    /// // can't find a solution within a bound of 10 derivatives
+    /// let s0 = re.get_string_bounded(e, 10);
+    /// assert!(matches!(s0, BoundedSearch::Failed));
+    ///
+    /// // we can find a solution with a larger bound
+    /// let s1 = re.get_string_bounded(e, 50);
+    /// match s1 {
+    ///     BoundedSearch::Some(s) => assert!(s.len() == 40),
+    ///     BoundedSearch::Empty => panic!("the regular expression `ab^20` is not empty"),
+    ///     BoundedSearch::Failed => panic!("unexpected failure in bounded search"),
+    /// }
+    /// ```
+    pub fn get_string_bounded(
+        &mut self,
+        e: RegLan,
+        max_derivatives: usize,
+    ) -> BoundedSearch<SmtString> {
+        match self.get_string_path(e, max_derivatives) {
+            BoundedSearch::Failed => BoundedSearch::Failed,
+            BoundedSearch::Empty => BoundedSearch::Empty,
+            BoundedSearch::Some(path) => {
+                let result: Vec<u32> = path
+                    .iter()
+                    .map(|(re, cid)| re.pick_class_rep(*cid))
+                    .collect();
+                BoundedSearch::Some(result.into())
+            }
+        }
     }
 
     ///
     /// Get a string that belongs to a regular expression
     ///
-    /// Return None if the regular expression `e` is empty.
+    /// # Returns
+    /// - `None` if the regular expression `e` is empty.
+    /// - `Some(s)` otherwise where `s` is an SMT string that belongs to `e`.
     ///
     /// # Example
     /// ```
@@ -2245,36 +2330,31 @@ impl ReManager {
     /// assert!(str == Some(str1) || str == Some(str2));
     /// ```
     pub fn get_string(&mut self, e: RegLan) -> Option<SmtString> {
-        match self.get_string_path(e) {
-            None => None,
-            Some(path) => {
-                let result: Vec<u32> = path
-                    .iter()
-                    .map(|(re, cid)| re.pick_class_rep(*cid))
-                    .collect();
-                Some(result.into())
-            }
+        match self.get_string_bounded(e, usize::MAX) {
+            BoundedSearch::Failed => unreachable!(),
+            BoundedSearch::Empty => None,
+            BoundedSearch::Some(s) => Some(s),
         }
     }
 
     //
-    // try to compile to a DFA of no more than max_states.
-    // return None if that fails (i.e., if the automaton will have more than max_states)
+    // try to compile to a DFA with a bound on the number of derivatives constructed.
+    // return None if that fails
     //
-    fn compile_with_bound(&mut self, e: RegLan, max_states: usize) -> Option<Automaton> {
-        if max_states == 0 {
+    fn compile_with_bound(&mut self, e: RegLan, max_derivatives: usize) -> Option<Automaton> {
+        if max_derivatives == 0 {
             None
         } else {
             let mut builder = AutomatonBuilder::new(&e.expr);
             let mut queue = BfsQueue::new();
-            let mut state_count = 0;
+            let mut deriv_count = 0;
             queue.push(e);
             while let Some(e) = queue.pop() {
-                debug_assert!(state_count <= max_states);
-                if state_count == max_states {
+                debug_assert!(deriv_count <= max_derivatives);
+                if deriv_count == max_derivatives {
                     return None;
                 }
-                state_count += 1;
+                deriv_count += 1;
                 for set in e.char_ranges() {
                     let d = self.set_derivative_unchecked(e, set);
                     queue.push(d);
@@ -2318,6 +2398,8 @@ impl ReManager {
     /// assert!(auto.accepts(&"acbcbc".into()))
     /// ```
     pub fn compile(&mut self, e: RegLan) -> Automaton {
+        // we rely on the fact that `compile_with_bound` can't return None
+        // when the bound is usize::MAX
         self.compile_with_bound(e, usize::MAX).unwrap()
     }
 
@@ -2325,12 +2407,16 @@ impl ReManager {
     /// Compile a regular expression to a DFA of bounded size
     ///
     /// Try to compile a regular expression `e` to a deterministic finite-state automaton
-    /// of size no more than `max_states`.
+    /// by computing a limited number of derivatives.
     /// - e: regular expression
-    /// - max_states: bound
+    /// - max_derivatives: bound on the number of derivatives
     ///
-    /// Return None if the DFA has more than `max_states`
-    /// Return `Some(a)` otherwise where `a` is the automaton
+    /// If the construction succeeds, it is guaranteed that the resulting DFA has no more than
+    /// `max_derivatives` states.
+    ///
+    /// # Returns
+    /// - `None` if `e` has more than `max_derivatives` derivatives (i.e., the DFA wasn't built)
+    /// - `Some(a)` otherwise where `a` is the automaton
     ///
     /// # Example
     ///
@@ -2352,8 +2438,8 @@ impl ReManager {
     /// let test2 = re.try_compile(e, 4);
     /// assert!(test2.is_some());
     /// ```
-    pub fn try_compile(&mut self, e: RegLan, max_states: usize) -> Option<Automaton> {
-        self.compile_with_bound(e, max_states)
+    pub fn try_compile(&mut self, e: RegLan, max_derivatives: usize) -> Option<Automaton> {
+        self.compile_with_bound(e, max_derivatives)
     }
 }
 
