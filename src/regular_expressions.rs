@@ -2608,6 +2608,18 @@ mod tests {
     }
 
     #[test]
+    fn test_star_and_plus() {
+        let re = &mut ReManager::new();
+        let none = re.empty();
+        let eps = re.epsilon();
+
+        assert_eq!(re.star(none), eps);
+        assert_eq!(re.star(eps), eps);
+        assert_eq!(re.plus(none), none);
+        assert_eq!(re.plus(eps), eps);
+    }
+
+    #[test]
     fn test_concat() {
         let re = &mut ReManager::new();
         let v = build_atoms(re);
