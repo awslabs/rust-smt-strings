@@ -1377,8 +1377,9 @@ impl ReManager {
             e
         } else {
             match &e.expr {
-                // empty ^ [i, j] --> empty
-                BaseRegLan::Empty => self.empty,
+                // empty ^ [i, j] --> empty if i > 0
+                // empty ^ [0 .. ] --> epsilon
+                BaseRegLan::Empty => if range.start() == 0 { self.epsilon } else { self.empty },
                 // epsilon ^ [i, j] --> epsilon
                 BaseRegLan::Epsilon => self.epsilon,
                 // (R ^[i,j]) ^ [k, l] --> R ^[i *k, j*l] if the product is exact
