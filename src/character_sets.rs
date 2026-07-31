@@ -917,6 +917,7 @@ impl CharPartition {
         let (a_i, b_i) = self.get(i);
 
         if a < a_i {
+            // if p is empty, we have i = 0 and a_0 = b_0 = MAX_CHAR+1
             debug_assert!(i == 0);
             if b < a_i {
                 // a <= b < a_0
@@ -935,7 +936,9 @@ impl CharPartition {
             }
         } else {
             // note: we know i < p.len() <= MAX_CHAR so i+1 can't overflow here
-            let next_ai = self.end(i + 1);
+            // we have a_i <= b_i < a <= b
+            let next_ai = self.start(i + 1);
+            // if i is the last interval, next_ai = MAX_CHAR+1
             if b < next_ai {
                 // a_i <= b_i < a <= b < a_{i+1}
                 CoverResult::DisjointFromAll
@@ -1447,5 +1450,17 @@ mod test {
             }
             println!();
         }
+    }
+
+    #[test]
+    fn test_cover2() {
+        let mut p = CharPartition::new();
+        p.push(0, 0);
+        p.push(10, 20);
+
+        let s = CharSet::range(5, 10);
+
+        assert!(p.interval(1).contains(10)); // 10 is in interval 1
+        assert_eq!(p.interval_cover(&s), CoverResult::Overlaps);
     }
 }
