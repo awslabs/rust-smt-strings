@@ -284,10 +284,11 @@ impl CharSet {
         } else {
             let mut result = a[0];
             for s in &a[1..] {
-                match result.inter(s) {
-                    None => return None,
-                    Some(x) => result = x,
-                }
+                result = result.inter(s)?
+                // match result.inter(s) {
+                //     None => return None,
+                //     Some(x) => result = x,
+                // }
             }
             Some(result)
         }
@@ -1245,10 +1246,10 @@ mod test {
         assert_ne!(&p1, &p4);
         assert_ne!(&p1, &p5);
 
-        println!("Empty partition: {}", &p1);
-        println!("Example1: {}", &p2);
-        println!("Example2: {}", &p4);
-        println!("All chars: {}", &p5);
+        println!("Empty partition: {p1}");
+        println!("Example1: {p2}");
+        println!("Example2: {p4}");
+        println!("All chars: {p5}");
     }
 
     #[test]
@@ -1261,7 +1262,7 @@ mod test {
 
         match CharPartition::try_from_list(&v) {
             Ok(p) => {
-                println!("From list succeeded: {}", &p);
+                println!("From list succeeded: {p}");
                 assert_eq!(p.len(), 3);
                 assert_eq!(p.get(0), (0, 10));
                 assert_eq!(p.get(1), (120, 400));
@@ -1340,7 +1341,7 @@ mod test {
         for p in &v {
             for q in &v {
                 let m = merge_partitions(p, q);
-                println!("Merge({}, {}) = {}", p, q, &m);
+                println!("Merge({p}, {q}) = {m}");
 
                 assert!(good_partition(&m));
 

@@ -441,7 +441,7 @@ mod test {
         for r in make_examples() {
             for k in 0..5 {
                 let s = r.scale(k);
-                println!("scale({}, {}) = {}", r, k, &s);
+                println!("scale({r}, {k}) = {s}");
                 match k {
                     0 => assert!(s.is_zero()),
                     1 => assert_eq!(s, r),

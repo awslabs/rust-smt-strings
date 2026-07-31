@@ -482,7 +482,7 @@ impl Display for Automaton {
         writeln!(f, "initial state: {}", self.initial_state())?;
         write!(f, "final state{}:", plural(self.num_final_states))?;
         for s in self.final_states() {
-            write!(f, " {}", &s)?;
+            write!(f, " {s}")?;
         }
         writeln!(f)?;
         writeln!(f, "transitions:")?;
