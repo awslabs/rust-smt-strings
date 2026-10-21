@@ -12,7 +12,7 @@ use std::{
 
 use vstd::prelude::*;
 #[cfg(verus_only)]
-use vstd::std_specs::hash::obeys_key_model;
+use vstd::std_specs::{hash::obeys_key_model, iter::IteratorSpec};
 
 verus! {
 
@@ -95,7 +95,6 @@ impl<T: Eq + Hash + Copy> BfsQueue<T> {
     /// this linkage to verify the body, so we trust the implementation
     /// and verify only the specification contract.
     ///
-    #[verifier::external_body]
     pub(crate) fn push(&mut self, element: T) -> (ret: bool)
         requires
             old(self).well_formed(),
@@ -162,16 +161,31 @@ impl<T: Eq + Hash + Copy> BfsQueue<T> {
     ///
     /// Push all elements from an iterator
     ///
-    pub(crate) fn push_all(&mut self, iter: impl IntoIterator<Item = T>)
+    pub(crate) fn push_all<I: Iterator<Item = T>>(&mut self, iter: I)
         requires
-            old(self).well_formed()
+            old(self).well_formed(),
+            IteratorSpec::obeys_prophetic_iter_laws(&iter),
+            IteratorSpec::will_return_none(&iter),
+            IteratorSpec::decrease(&iter) is Some,
         ensures
-            final(self).well_formed()
+            final(self).well_formed(),
     {
-        for x in iter
-            invariant self.well_formed()
+        let mut iter = iter;
+        loop
+            invariant
+                self.well_formed(),
+                IteratorSpec::obeys_prophetic_iter_laws(&iter),
+                IteratorSpec::will_return_none(&iter),
+                IteratorSpec::decrease(&iter) is Some,
+            decreases
+                IteratorSpec::decrease(&iter)->0,
         {
-            self.push(x);
+            match iter.next() {
+                Some(x) => {
+                    self.push(x);
+                },
+                None => break,
+            }
         }
     }
 }

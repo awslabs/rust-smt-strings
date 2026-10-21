@@ -346,7 +346,6 @@ where
             // we create two new splitters
             // both of them are active if s is active
             // only one of them is active if s is inactive
-
             let (active1, active2) = if s.active {
                 (true, true)
             } else if p.smaller_block(class1, class2) {
