@@ -346,18 +346,14 @@ where
             // we create two new splitters
             // both of them are active if s is active
             // only one of them is active if s is inactive
-            let active1;
-            let active2;
-            if s.active {
-                active1 = true;
-                active2 = true;
+
+            let (active1, active2) = if s.active {
+                (true, true)
             } else if p.smaller_block(class1, class2) {
-                active1 = true;
-                active2 = false;
+                (true, false)
             } else {
-                active1 = false;
-                active2 = true;
-            }
+                (false, true)
+            };
 
             if class1 != 0 {
                 self.splitters.add_splitter(&Splitter {
