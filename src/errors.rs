@@ -6,6 +6,9 @@
 //!
 
 use std::fmt::Display;
+use vstd::prelude::*;
+
+verus! {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 ///
@@ -44,7 +47,13 @@ pub enum Error {
 
     /// No default successor specified for an automaton state when one is required.
     MissingDefaultSuccessor,
+
+    /// The result of an operation on [LoopRange][crate::loop_ranges::LoopRange]s
+    /// cannot be represented using 32bit unsigned integers.
+    ArithmeticOverflow,
 }
+
+} // verus!
 
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -55,6 +64,7 @@ impl Display for Error {
             Self::BadClassId => "bad class id",
             Self::NonDisjointCharSets => "expected disjoint character sets",
             Self::MissingDefaultSuccessor => "a default successor is required",
+            Self::ArithmeticOverflow => "arithmetic overflow in loop range",
         }
         .fmt(f)
     }

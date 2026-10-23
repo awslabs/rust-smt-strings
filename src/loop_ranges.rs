@@ -20,10 +20,14 @@
 //! This module implements operations on loop ranges. Each range is
 //! a pair (i, j) where 0 <= i <= j and j may be infinite.
 //!
-//! We limit i and j to u32. The code will panic in case of arithmetic overflow.
+//! We limit i and j to u32. Addition of ranges returns an error in case of
+//! arithmetic overflow. The other operations panic in case of arithmetic overflow.
 //!
 
 use std::fmt::Display;
+use vstd::prelude::*;
+
+use crate::errors::Error;
 
 ///
 /// Loop range
@@ -32,19 +36,34 @@ use std::fmt::Display;
 /// - A finite interval is represented as `LoopRange(i, Some(j))` where 0 <= i <= j
 /// - An infinite interval is represented as `LoopRange(i, None)`.
 ///
-/// The integers i and j are stored as u32. Operations on loop ranges will panic if
-/// results cannot be stored using 32bit unsigned integers.
+/// The integers i and j are stored as u32. [add][Self::add] and [add_point][Self::add_point]
+/// return [Error::ArithmeticOverflow] if the result cannot be stored using 32bit
+/// unsigned integers. The other operations panic in that case.
 ///
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct LoopRange(u32, Option<u32>);
 
+verus! {
+
 /// Wrapper for addition with overflow detection
 ///
-/// Panics if there's an overflow.
-/// Returns x + y otherwise.
-fn add32(x: u32, y: u32) -> u32 {
-    x.checked_add(y).expect("Arithmetic overflow (add u32)")
+/// Returns `Err(Error::ArithmeticOverflow)` if there's an overflow.
+/// Returns `Ok(x + y)` otherwise.
+///
+/// The body matches on `checked_add` directly, so the proof trusts only
+/// vstd's specification of `u32::checked_add`.
+fn add32(x: u32, y: u32) -> (r: Result<u32, Error>)
+    ensures
+        x + y <= u32::MAX ==> r == Ok((x + y) as u32),
+        x + y > u32::MAX ==> r == Err::<u32, Error>(Error::ArithmeticOverflow),
+{
+    match x.checked_add(y) {
+        Some(s) => Ok(s),
+        None => Err(Error::ArithmeticOverflow),
+    }
 }
+
+} // verus!
 
 /// Wrapper for multiplication with overflow detection
 ///
@@ -178,23 +197,25 @@ impl LoopRange {
     ///
     /// Add two ranges
     ///
-    /// The result is the union of both ranges.
+    /// The result is the interval sum of both ranges. For finite ranges [a, b]
+    /// and [c, d], the result is [a + c, b + d]. If either upper bound is
+    /// infinite, the result's upper bound is infinite.
     ///
     /// This is used to rewrite `(concat (loop L a b) (loop L c d))`
     /// to `(loop L (add [a, b], [c, d]))`.
     ///
-    /// # Panics
+    /// # Errors
     ///
-    /// If an arithmetic overflow occurs, that is, the union of the two ranges
-    /// cannot be represented using 32bit unsigned integers, this method will panic.
+    /// Returns [Error::ArithmeticOverflow] if the bounds of the result
+    /// cannot be represented using 32bit unsigned integers.
     ///
-    pub fn add(&self, other: &LoopRange) -> LoopRange {
-        let i = add32(self.start(), other.start());
+    pub fn add(&self, other: &LoopRange) -> Result<LoopRange, Error> {
+        let i = add32(self.start(), other.start())?;
         if self.is_infinite() || other.is_infinite() {
-            LoopRange::infinite(i)
+            Ok(LoopRange::infinite(i))
         } else {
-            let j = add32(self.end(), other.end());
-            LoopRange::finite(i, j)
+            let j = add32(self.end(), other.end())?;
+            Ok(LoopRange::finite(i, j))
         }
     }
 
@@ -203,10 +224,11 @@ impl LoopRange {
     ///
     /// Add the point interval [x, x] to self.
     ///
-    /// # Panics
+    /// # Errors
     ///
-    /// If there's an arithmetic overflow. See [add][Self::add].
-    pub fn add_point(&self, x: u32) -> LoopRange {
+    /// Returns [Error::ArithmeticOverflow] if there's an arithmetic overflow.
+    /// See [add][Self::add].
+    pub fn add_point(&self, x: u32) -> Result<LoopRange, Error> {
         self.add(&Self::point(x))
     }
 
@@ -381,6 +403,7 @@ impl LoopRange {
 #[cfg(test)]
 mod test {
     use super::LoopRange;
+    use crate::errors::Error;
 
     fn make_examples() -> Vec<LoopRange> {
         vec![
@@ -429,10 +452,29 @@ mod test {
         let v = make_examples();
         for r in &v {
             for s in &v {
-                println!("add({}, {}) = {}", r, s, r.add(s))
+                println!("add({}, {}) = {}", r, s, r.add(s).unwrap())
             }
         }
         println!()
+    }
+
+    #[test]
+    fn test_add_overflow() {
+        let max = LoopRange::point(u32::MAX);
+        assert_eq!(max.add_point(0), Ok(max));
+        assert_eq!(max.add_point(1), Err(Error::ArithmeticOverflow));
+        assert_eq!(
+            LoopRange::finite(0, u32::MAX).add_point(1),
+            Err(Error::ArithmeticOverflow)
+        );
+        assert_eq!(
+            LoopRange::infinite(u32::MAX).add(&LoopRange::star()),
+            Ok(LoopRange::infinite(u32::MAX))
+        );
+        assert_eq!(
+            LoopRange::infinite(u32::MAX).add(&LoopRange::plus()),
+            Err(Error::ArithmeticOverflow)
+        );
     }
 
     #[test]

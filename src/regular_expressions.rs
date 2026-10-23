@@ -1285,16 +1285,36 @@ impl ReManager {
             (BaseRegLan::Epsilon, _) => e2,
             (_, BaseRegLan::Epsilon) => e1,
             // R . R^[i,j] --> R^[i+1, j+1]
-            (_, BaseRegLan::Loop(y, rng)) if *e1 == **y => {
-                self.make(BaseRegLan::Loop(e1, rng.add_point(1)))
-            }
-            (BaseRegLan::Loop(x, rng), _) if *e2 == **x => {
-                self.make(BaseRegLan::Loop(e2, rng.add_point(1)))
-            }
+            (_, BaseRegLan::Loop(y, rng)) if *e1 == **y => match rng.add_point(1) {
+                Ok(r) => self.make(BaseRegLan::Loop(e1, r)),
+                // [i+1, j+1] doesn't fit in u32: don't merge
+                Err(Error::ArithmeticOverflow) => self.concat_no_loop_merge(e1, e2),
+                Err(e) => unreachable!("unexpected error from LoopRange::add_point: {}", e),
+            },
+            (BaseRegLan::Loop(x, rng), _) if *e2 == **x => match rng.add_point(1) {
+                Ok(r) => self.make(BaseRegLan::Loop(e2, r)),
+                Err(Error::ArithmeticOverflow) => self.concat_no_loop_merge(e1, e2),
+                Err(e) => unreachable!("unexpected error from LoopRange::add_point: {}", e),
+            },
             // R^[a,b] . R^[b,c] -> R^[a+b, b+c]
             (BaseRegLan::Loop(x, x_rng), BaseRegLan::Loop(y, y_rng)) if *x == *y => {
-                self.make(BaseRegLan::Loop(x, x_rng.add(y_rng)))
+                match x_rng.add(y_rng) {
+                    Ok(r) => self.make(BaseRegLan::Loop(x, r)),
+                    Err(Error::ArithmeticOverflow) => self.concat_no_loop_merge(e1, e2),
+                    Err(e) => unreachable!("unexpected error from LoopRange::add: {}", e),
+                }
             }
+            _ => self.concat_no_loop_merge(e1, e2),
+        }
+    }
+
+    /// Concatenation rules that apply after the empty, epsilon,
+    /// and loop-merging rules of [concat](Self::concat).
+    ///
+    /// Also used by [concat](Self::concat) when merging two loops
+    /// would overflow a loop bound.
+    fn concat_no_loop_merge(&mut self, e1: RegLan, e2: RegLan) -> RegLan {
+        match (&e1.expr, &e2.expr) {
             // R . R -> R^2
             _ if *e1 == *e2 => self.make(BaseRegLan::Loop(e1, LoopRange::point(2))),
             // (R . S) . T -> R . (S . T)
@@ -2498,6 +2518,26 @@ mod tests {
         println!("   pattern:   {}", r.simple_pattern);
         println!("   deriv:     {}", r.deriv_class);
         println!();
+    }
+
+    #[test]
+    fn concat_loop_bound_overflow() {
+        let mut re = ReManager::new();
+        let a = re.char('a' as u32);
+        let big = re.mk_loop(a, LoopRange::finite(0, u32::MAX));
+        let big2 = re.mk_loop(a, LoopRange::finite(1, u32::MAX));
+
+        // these used to panic with "Arithmetic overflow (add u32)"
+        let e1 = re.concat(a, big);
+        let e2 = re.concat(big, a);
+        let e3 = re.concat(big, big2);
+
+        for e in [e1, e2, e3] {
+            assert!(matches!(e.expr, BaseRegLan::Concat(_, _)));
+            assert!(!re.str_in_re(&"".into(), e));
+            assert!(re.str_in_re(&"a".into(), e));
+            assert!(re.str_in_re(&"aaa".into(), e));
+        }
     }
 
     fn build_atoms(re: &mut ReManager) -> Vec<RegLan> {
