@@ -1410,7 +1410,12 @@ impl ReManager {
                 BaseRegLan::Epsilon => self.epsilon,
                 // (R ^[i,j]) ^ [k, l] --> R ^[i *k, j*l] if the product is exact
                 BaseRegLan::Loop(x, x_rng) if x_rng.right_mul_is_exact(&range) => {
-                    self.make(BaseRegLan::Loop(x, x_rng.mul(&range)))
+                    match x_rng.mul(&range) {
+                        Ok(r) => self.make(BaseRegLan::Loop(x, r)),
+                        // The flattened bounds don't fit in u32: keep the nested loop.
+                        Err(Error::ArithmeticOverflow) => self.make(BaseRegLan::Loop(e, range)),
+                        Err(err) => unreachable!("unexpected error from LoopRange::mul: {}", err),
+                    }
                 }
                 _ => self.make(BaseRegLan::Loop(e, range)),
             }
@@ -2538,6 +2543,22 @@ mod tests {
             assert!(re.str_in_re(&"a".into(), e));
             assert!(re.str_in_re(&"aaa".into(), e));
         }
+    }
+
+    #[test]
+    fn mk_loop_bound_overflow() {
+        let mut re = ReManager::new();
+        let a = re.char('a' as u32);
+        let inner_range = LoopRange::finite(2_000_000_000, 4_000_000_000);
+        let outer_range = LoopRange::finite(3, 4);
+        let inner = re.mk_loop(a, inner_range);
+
+        // Flattening would overflow both bounds. Keep the exact nested loop.
+        let nested = re.mk_loop(inner, outer_range);
+        assert!(matches!(
+            &nested.expr,
+            BaseRegLan::Loop(body, range) if **body == *inner && *range == outer_range
+        ));
     }
 
     fn build_atoms(re: &mut ReManager) -> Vec<RegLan> {
