@@ -20,8 +20,8 @@
 //! This module implements operations on loop ranges. Each range is
 //! a pair (i, j) where 0 <= i <= j and j may be infinite.
 //!
-//! We limit i and j to u32. Addition of ranges returns an error in case of
-//! arithmetic overflow. The other operations panic in case of arithmetic overflow.
+//! We limit i and j to u32. Addition and multiplication of ranges return an error
+//! in case of arithmetic overflow. The other operations panic in that case.
 //!
 
 use std::fmt::Display;
@@ -36,9 +36,10 @@ use crate::errors::Error;
 /// - A finite interval is represented as `LoopRange(i, Some(j))` where 0 <= i <= j
 /// - An infinite interval is represented as `LoopRange(i, None)`.
 ///
-/// The integers i and j are stored as u32. [add][Self::add] and [add_point][Self::add_point]
-/// return [Error::ArithmeticOverflow] if the result cannot be stored using 32bit
-/// unsigned integers. The other operations panic in that case.
+/// The integers i and j are stored as u32. [add][Self::add], [add_point][Self::add_point],
+/// [scale][Self::scale], and [mul][Self::mul] return [Error::ArithmeticOverflow]
+/// if the result cannot be stored using 32bit unsigned integers. The other operations
+/// panic in that case.
 ///
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct LoopRange(u32, Option<u32>);
@@ -63,15 +64,25 @@ fn add32(x: u32, y: u32) -> (r: Result<u32, Error>)
     }
 }
 
-} // verus!
-
 /// Wrapper for multiplication with overflow detection
 ///
-/// Panics is there's an overflow.
-/// Returns x * y otherwise.
-fn mul32(x: u32, y: u32) -> u32 {
-    x.checked_mul(y).expect("Arithmetic overflow (mul 32)")
+/// Returns `Err(Error::ArithmeticOverflow)` if there's an overflow.
+/// Returns `Ok(x * y)` otherwise.
+///
+/// The body matches on `checked_mul` directly, so the proof trusts only
+/// vstd's specification of `u32::checked_mul`.
+fn mul32(x: u32, y: u32) -> (r: Result<u32, Error>)
+    ensures
+        x * y <= u32::MAX ==> r == Ok((x * y) as u32),
+        x * y > u32::MAX ==> r == Err::<u32, Error>(Error::ArithmeticOverflow),
+{
+    match x.checked_mul(y) {
+        Some(p) => Ok(p),
+        None => Err(Error::ArithmeticOverflow),
+    }
 }
+
+} // verus!
 
 impl Display for LoopRange {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -246,20 +257,21 @@ impl LoopRange {
     ///
     ///   `(loop L i j)^k` = `(loop L (k * i) (k * j))`
     ///
-    /// # Panics
+    /// # Errors
     ///
-    /// If there's an arithmetic overflow in k * i or k * j.
+    /// Returns [Error::ArithmeticOverflow] if `k * i` or `k * j` cannot be
+    /// represented using 32bit unsigned integers.
     ///
-    pub fn scale(&self, k: u32) -> LoopRange {
+    pub fn scale(&self, k: u32) -> Result<LoopRange, Error> {
         if k == 0 {
-            LoopRange::point(0)
+            Ok(LoopRange::point(0))
         } else if self.is_infinite() {
-            let i = mul32(self.start(), k);
-            LoopRange::infinite(i)
+            let i = mul32(self.start(), k)?;
+            Ok(LoopRange::infinite(i))
         } else {
-            let i = mul32(self.start(), k);
-            let j = mul32(self.end(), k);
-            LoopRange::finite(i, j)
+            let i = mul32(self.start(), k)?;
+            let j = mul32(self.end(), k)?;
+            Ok(LoopRange::finite(i, j))
         }
     }
 
@@ -287,22 +299,21 @@ impl LoopRange {
     /// Method [right_mul_is_exact][Self::right_mul_is_exact] can be used to check
     /// whether the product is exact.
     ///
-    /// # Panics
+    /// # Errors
     ///
-    /// If there's an arithmetic overflow in the product computation,
-    /// that is, the result cannot be stored using u32 integers, this
-    /// method will panic.
+    /// Returns [Error::ArithmeticOverflow] if a finite bound of the product
+    /// cannot be represented using 32bit unsigned integers.
     ///
-    pub fn mul(&self, other: &LoopRange) -> LoopRange {
+    pub fn mul(&self, other: &LoopRange) -> Result<LoopRange, Error> {
         if self.is_zero() || other.is_zero() {
-            LoopRange::point(0)
+            Ok(LoopRange::point(0))
         } else if self.is_infinite() || other.is_infinite() {
-            let i = mul32(self.start(), other.start());
-            LoopRange::infinite(i)
+            let i = mul32(self.start(), other.start())?;
+            Ok(LoopRange::infinite(i))
         } else {
-            let i = mul32(self.start(), other.start());
-            let j = mul32(self.end(), other.end());
-            LoopRange::finite(i, j)
+            let i = mul32(self.start(), other.start())?;
+            let j = mul32(self.end(), other.end())?;
+            Ok(LoopRange::finite(i, j))
         }
     }
 
@@ -376,7 +387,13 @@ impl LoopRange {
                 // c = other.start()
                 // b = self.end()
                 // a = self.start()
-                mul32(other.start(), self.end() - self.start()) >= self.start().saturating_sub(1)
+                match mul32(other.start(), self.end() - self.start()) {
+                    Ok(product) => product >= self.start().saturating_sub(1),
+                    // The mathematical product is larger than u32::MAX, so it is
+                    // larger than the representable right-hand side.
+                    Err(Error::ArithmeticOverflow) => true,
+                    Err(e) => unreachable!("unexpected error from mul32: {}", e),
+                }
             }
     }
 
@@ -482,7 +499,7 @@ mod test {
         println!("Scaling tests");
         for r in make_examples() {
             for k in 0..5 {
-                let s = r.scale(k);
+                let s = r.scale(k).unwrap();
                 println!("scale({r}, {k}) = {s}");
                 match k {
                     0 => assert!(s.is_zero()),
@@ -495,12 +512,28 @@ mod test {
     }
 
     #[test]
+    fn test_scale_overflow() {
+        let max = LoopRange::point(u32::MAX);
+        assert_eq!(max.scale(0), Ok(LoopRange::point(0)));
+        assert_eq!(max.scale(1), Ok(max));
+        assert_eq!(max.scale(2), Err(Error::ArithmeticOverflow));
+        assert_eq!(
+            LoopRange::finite(1, u32::MAX).scale(2),
+            Err(Error::ArithmeticOverflow)
+        );
+        assert_eq!(
+            LoopRange::infinite(u32::MAX).scale(2),
+            Err(Error::ArithmeticOverflow)
+        );
+    }
+
+    #[test]
     fn test_mul() {
         println!("Product tests");
         let v = make_examples();
         for r in &v {
             for s in &v {
-                let product = r.mul(s);
+                let product = r.mul(s).unwrap();
                 let exact = r.right_mul_is_exact(s);
                 println!("mul({}, {}) = {} (exact: {})", r, s, product, exact);
 
@@ -513,6 +546,33 @@ mod test {
             }
         }
         println!()
+    }
+
+    #[test]
+    fn test_mul_overflow() {
+        let zero = LoopRange::point(0);
+        let one = LoopRange::point(1);
+        let two = LoopRange::point(2);
+        let max = LoopRange::point(u32::MAX);
+
+        assert_eq!(max.mul(&zero), Ok(zero));
+        assert_eq!(max.mul(&one), Ok(max));
+        assert_eq!(max.mul(&two), Err(Error::ArithmeticOverflow));
+        assert_eq!(
+            LoopRange::finite(1, u32::MAX).mul(&two),
+            Err(Error::ArithmeticOverflow)
+        );
+        assert_eq!(
+            LoopRange::infinite(u32::MAX).mul(&two),
+            Err(Error::ArithmeticOverflow)
+        );
+
+        // The exactness inequality can still be decided if its product
+        // is larger than u32::MAX.
+        let wide = LoopRange::finite(2_000_000_000, 4_000_000_000);
+        let repetitions = LoopRange::finite(3, 4);
+        assert!(wide.right_mul_is_exact(&repetitions));
+        assert_eq!(wide.mul(&repetitions), Err(Error::ArithmeticOverflow));
     }
 
     #[test]
@@ -549,12 +609,12 @@ mod test {
 
         // plus^opt is star
         assert!(plus.right_mul_is_exact(&opt));
-        assert_eq!(plus.mul(&opt), star);
+        assert_eq!(plus.mul(&opt), Ok(star));
         // star^opt is star
         assert!(star.right_mul_is_exact(&opt));
-        assert_eq!(star.mul(&opt), star);
+        assert_eq!(star.mul(&opt), Ok(star));
         // opt^opt is opt
         assert!(opt.right_mul_is_exact(&opt));
-        assert_eq!(opt.mul(&opt), opt);
+        assert_eq!(opt.mul(&opt), Ok(opt));
     }
 }
